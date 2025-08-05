@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Simple Token Test</title>
+</head>
+<body>
+    <h1>Simple Token Update Test</h1>
+    
+    <button onclick="testTokenUpdate()">Test Token Update</button>
+    <div id="result"></div>
+    
+    <script>
+        async function testTokenUpdate() {
+            console.log('Testing token update...');
+            
+            // Get auth token from localStorage
+            const authToken = localStorage.getItem('authToken');
+            console.log('Auth token:', authToken);
+            
+            if (!authToken) {
+                document.getElementById('result').innerHTML = '<p>No auth token found. Please log in first.</p>';
+                return;
+            }
+            
+            const testData = {
+                name: 'test-color',
+                category: 'color',
+                value: '#ff0000',
+                description: 'Test update'
+            };
+            
+            console.log('Test data:', testData);
+            
+            try {
+                const response = await fetch('/api/tokens/68853e85c3e0abcf5cfc90a9', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(testData)
+                });
+                
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                document.getElementById('result').innerHTML = 
+                    `<p>Status: ${response.status}</p><p>Response: ${JSON.stringify(data, null, 2)}</p>`;
+                    
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design System Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Light theme */
+            --bg-primary: #ffffff;
+            --bg-secondary: #ffffff;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --border-color: #e1e5e9;
+            --accent-color: #7e22ce;
+            --accent-hover: #581c87;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --card-bg: #ffffff;
+
+            /* Spacing tokens based on 8px scale */
+            --spacing-1: 8px;
+            --spacing-2: 16px;
+            --spacing-3: 24px;
+            --spacing-4: 32px;
+            --spacing-5: 40px;
+            --spacing-6: 48px;
+            --spacing-7: 56px;
+            --spacing-8: 64px;
+            --spacing-9: 72px;
+            --spacing-10: 80px;
+            --spacing-11: 88px;
+            --spacing-12: 96px;
+            --spacing-13: 104px;
+            --spacing-14: 112px;
+            --spacing-15: 120px;
+            --spacing-16: 128px;
+            --spacing-17: 136px;
+            --spacing-18: 144px;
+            --spacing-19: 152px;
+            --spacing-20: 160px;
+        }
+
+        [data-theme="dark"] {
+            /* Dark theme */
+            --bg-primary: #000C0E;
+            --bg-secondary: #020817;
+            --text-primary: #EAEEEF;
+            --text-secondary: #b0b0b0;
+            --border-color: #404040;
+            --accent-color: #c084fc;
+            --accent-hover: #d8b4fe;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            --card-bg: #020817;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Apply JetBrains Mono to all headers */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-5) var(--spacing-3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: var(--spacing-8);
+        }
+
+        .header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: var(--spacing-3);
+        }
+
+        .header p {
+            font-size: 1.3rem;
+            color: var(--text-primary);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: var(--spacing-4);
+            margin-bottom: var(--spacing-8);
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: var(--spacing-5);
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--spacing-3);
+            color: white;
+        }
+
+        .feature-icon i {
+            width: 40px;
+            height: 40px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: var(--spacing-2);
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: var(--spacing-3);
+        }
+
+        .btn {
+            font-family: 'JetBrains Mono', monospace;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            background: var(--accent-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            min-height: 44px;
+            min-width: 80px;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+            color: var(--bg-primary);
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-hover);
+            color: var(--bg-primary);
+        }
+
+        .stats-section {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-color);
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <div></div>
+                <button id="theme-toggle" class="btn btn-secondary" onclick="toggleTheme()">
+                    <i data-lucide="moon" id="theme-icon"></i>
+                    <span id="theme-text">Dark Mode</span>
+                </button>
+            </div>
+            <h3>Design System Manager</h3>
+            <p>A comprehensive tool for managing your design tokens and UI components. Create, organize, and maintain a consistent design system.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i data-lucide="layers"></i>
+                </div>
+                <h3>Component Library</h3>
+                <p>Create and manage reusable UI components with full documentation, code examples, and version control.</p>
+                <a href="/components" class="btn">Manage Components</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i data-lucide="palette"></i>
+                </div>
+                <h3>Design Tokens</h3>
+                <p>Organize colors, typography, spacing, and other design tokens in a centralized, accessible format.</p>
+                <a href="/components" class="btn">Manage Tokens</a>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i data-lucide="book-open"></i>
+                </div>
+                <h3>Developer Docs</h3>
+                <p>Comprehensive documentation with installation guides, API reference, and integration examples.</p>
+                <a href="/docs" class="btn">View Documentation</a>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h2>System Overview</h2>
+            <div class="stats-grid" id="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Components</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">Component Types</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">1</div>
+                    <div class="stat-label">Active Users</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Uptime</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Built with Node.js, Express, and MongoDB</p>
+        </div>
+    </div>
+
+    <script>
+        // Load live stats if available
+        async function loadStats() {
+            try {
+                const response = await fetch('/api/components/stats/overview');
+                if (response.ok) {
+                    const stats = await response.json();
+                    updateStats(stats);
+                }
+            } catch (error) {
+                console.log('Stats not available');
+            }
+        }
+
+        function updateStats(stats) {
+            const statsGrid = document.getElementById('stats-grid');
+            if (statsGrid && stats) {
+                statsGrid.innerHTML = `
+                    <div class="stat-item">
+                        <div class="stat-number">${stats.total || 0}</div>
+                        <div class="stat-label">Components</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${Object.keys(stats.typeCounts || {}).length}</div>
+                        <div class="stat-label">Component Types</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">${stats.statusCounts?.active || 0}</div>
+                        <div class="stat-label">Active Components</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Uptime</div>
+                    </div>
+                `;
+            }
+        }
+
+        // Theme management
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeButton(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton(newTheme);
+        }
+
+        function updateThemeButton(theme) {
+            const icon = document.getElementById('theme-icon');
+            const text = document.getElementById('theme-text');
+            
+            if (theme === 'dark') {
+                icon.setAttribute('data-lucide', 'sun');
+                text.textContent = 'Light Mode';
+            } else {
+                icon.setAttribute('data-lucide', 'moon');
+                text.textContent = 'Dark Mode';
+            }
+            
+            // Reinitialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Load stats on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize theme
+            initializeTheme();
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+            
+            // Load stats
+            loadStats();
+        });
+    </script>
+</body>
+</html>

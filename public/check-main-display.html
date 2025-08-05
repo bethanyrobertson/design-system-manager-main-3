@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Check Main App Display</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .token { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .test-token { background: #ffeb3b; border-color: #ffc107; }
+        .error { color: red; }
+        .success { color: green; }
+        .info { color: blue; }
+        .warning { color: orange; }
+        .token-list { max-height: 400px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Check Main App Token Display</h1>
+    <div id="status">Loading...</div>
+    <div id="comparison"></div>
+    <div id="token-list" class="token-list"></div>
+
+    <script>
+        async function checkMainDisplay() {
+            const statusDiv = document.getElementById('status');
+            const comparisonDiv = document.getElementById('comparison');
+            const tokenListDiv = document.getElementById('token-list');
+            
+            try {
+                statusDiv.innerHTML = 'Step 1: Checking auth token...';
+                
+                // Get auth token from localStorage (same as main app)
+                const authToken = localStorage.getItem('authToken');
+                if (!authToken) {
+                    statusDiv.innerHTML = '<span class="error">❌ No auth token found</span>';
+                    return;
+                }
+                
+                statusDiv.innerHTML = '<span class="success">✅ Auth token found</span><br>Step 2: Loading tokens...';
+                
+                // Load tokens from API (same as main app)
+                const response = await fetch('/api/tokens?limit=200', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    statusDiv.innerHTML = `<span class="error">❌ API error: ${response.status}</span>`;
+                    return;
+                }
+                
+                const data = await response.json();
+                console.log('API response:', data);
+                
+                                       if (!data) {
+                           statusDiv.innerHTML = `<span class="error">❌ Invalid API response: ${typeof data}</span>`;
+                           return;
+                       }
+                       
+                       // Handle both array and object responses
+                       let tokens;
+                       if (Array.isArray(data)) {
+                           tokens = data;
+                       } else if (data.tokens && Array.isArray(data.tokens)) {
+                           tokens = data.tokens;
+                       } else {
+                           statusDiv.innerHTML = `<span class="error">❌ Invalid API response format: ${typeof data}</span>`;
+                           return;
+                       }
+                
+                                       statusDiv.innerHTML = `<span class="success">✅ Loaded ${tokens.length} tokens</span>`;
+                       
+                       // Check for test-color token
+                       const testToken = tokens.find(token => token.name === 'test-color');
+                if (testToken) {
+                    comparisonDiv.innerHTML = `
+                        <div class="success">
+                            <h3>✅ Found test-color token:</h3>
+                            <p><strong>Name:</strong> ${testToken.name}</p>
+                            <p><strong>Value:</strong> ${testToken.value}</p>
+                            <p><strong>Category:</strong> ${testToken.category}</p>
+                            <p><strong>Description:</strong> ${testToken.description || 'None'}</p>
+                        </div>
+                    `;
+                } else {
+                    comparisonDiv.innerHTML = `
+                        <div class="error">
+                            <h3>❌ test-color token NOT found in API response</h3>
+                            <p>This means the API is not returning the updated token.</p>
+                        </div>
+                    `;
+                }
+                
+                                       // Show first 20 tokens
+                       tokenListDiv.innerHTML = '<h3>First 20 tokens from API:</h3>';
+                       tokens.slice(0, 20).forEach((token, index) => {
+                    const isTestToken = token.name === 'test-color';
+                    tokenListDiv.innerHTML += `
+                        <div class="token ${isTestToken ? 'test-token' : ''}">
+                            <strong>${index + 1}.</strong> ${token.name} (${token.category}): ${token.value}
+                            ${isTestToken ? ' <span class="success">← TEST TOKEN</span>' : ''}
+                        </div>
+                    `;
+                });
+                
+                                       if (tokens.length > 20) {
+                           tokenListDiv.innerHTML += `<p class="info">... and ${tokens.length - 20} more tokens</p>`;
+                       }
+                
+            } catch (error) {
+                statusDiv.innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+                console.error('Error:', error);
+            }
+        }
+        
+        // Run the check when page loads
+        checkMainDisplay();
+    </script>
+</body>
+</html> 

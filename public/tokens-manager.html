@@ -1,0 +1,1299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Token Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            /* Light theme */
+            --bg-primary: #ffffff;
+            --bg-secondary: #ffffff;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --border-color: #e1e5e9;
+            --accent-color: #7e22ce;
+            --accent-hover: #581c87;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --card-bg: #ffffff;
+            --input-bg: #ffffff;
+            --code-bg: #f8f9fa;
+            --danger-color: #dc3545;
+            --danger-hover: #c82333;
+
+            /* Spacing tokens based on 8px scale */
+            --spacing-1: 8px;
+            --spacing-2: 16px;
+            --spacing-3: 24px;
+            --spacing-4: 32px;
+            --spacing-5: 40px;
+            --spacing-6: 48px;
+            --spacing-7: 56px;
+            --spacing-8: 64px;
+            --spacing-9: 72px;
+            --spacing-10: 80px;
+            --spacing-11: 88px;
+            --spacing-12: 96px;
+            --spacing-13: 104px;
+            --spacing-14: 112px;
+            --spacing-15: 120px;
+            --spacing-16: 128px;
+            --spacing-17: 136px;
+            --spacing-18: 144px;
+            --spacing-19: 152px;
+            --spacing-20: 160px;
+        }
+
+        [data-theme="dark"] {
+            /* Dark theme */
+            --bg-primary: #000C0E;
+            --bg-secondary: #020817;
+            --text-primary: #EAEEEF;
+            --text-secondary: #b0b0b0;
+            --border-color: #404040;
+            --accent-color: #c084fc;
+            --accent-hover: #d8b4fe;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            --card-bg: #020817;
+            --input-bg: #1f2121;
+            --code-bg: #1E1E1E;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Apply JetBrains Mono to all headers */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-3);
+        }
+
+        .header {
+            background: #FCFCF9;
+            border-radius: 8px;
+            padding: var(--spacing-4);
+            margin-bottom: var(--spacing-4);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #02514E;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .auth-section {
+            background: #FCFCF9;
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-form {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .auth-form input {
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .auth-form input:focus {
+            outline: none;
+            border-color: #02514E;
+        }
+
+        .btn {
+            font-family: 'JetBrains Mono', monospace;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            min-height: 44px;
+            min-width: 80px;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-primary-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--accent-color);
+            border: 1px solid var(--accent-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-hover);
+            color: var(--bg-primary);
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: #D8001B;
+            border: 2px solid #D8001B;
+        }
+
+        .btn-danger:hover {
+            background: #D8001B;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 12px;
+            min-height: 36px;
+            min-width: 60px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        .sidebar {
+            background: #FCFCF9;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar h3 {
+            margin-bottom: 20px;
+            color: #495057;
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            padding-right: 48px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #02514E;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .import-export-section {
+            border: 3px dashed #02514E;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+        }
+
+        .import-export-section h4 {
+            margin-bottom: 15px;
+            color: #495057;
+        }
+
+        .file-input {
+            margin-bottom: 15px;
+        }
+
+        .file-input input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed #e1e5e9;
+            border-radius: 8px;
+            background: #f8f9fa;
+        }
+
+        .main-panel {
+            background: #FCFCF9;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .panel-header h3 {
+            color: #495057;
+            font-size: 1.5rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .filters input {
+            padding: 10px 16px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+
+        .filters select {
+            padding: 10px 16px;
+            padding-right: 48px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 150px;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            background-size: 16px;
+        }
+
+        .filters input:focus,
+        .filters select:focus {
+            outline: none;
+            border-color: #02514E;
+        }
+
+        .tokens-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .tokens-table th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .tokens-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+
+        .tokens-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .token-example {
+            width: 40px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid #e9ecef;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .token-name {
+            font-family: monospace;
+            font-weight: 500;
+            color: #2d3748;
+        }
+
+        .token-value {
+            font-family: monospace;
+            color: #4a5568;
+            font-size: 13px;
+        }
+
+        .token-value-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .token-value-copy-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 6px;
+            background: transparent;
+            border: 1px solid #e1e5e9;
+            border-radius: 4px;
+            font-size: 10px;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .token-value-copy-btn:hover {
+            background: #02514E;
+            color: white;
+            border-color: #02514E;
+        }
+
+        .category-badge {
+            padding: 6px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .category-badge.color {
+            background: #51F0DB;
+            color: #0A0A0A;
+            border-color: #51F0DB;
+        }
+
+        .category-badge.typography {
+            background: #FFC542;
+            color: #000000;
+            border-color: #FFC542;
+        }
+
+        .category-badge.spacing {
+            background: #94CDFF;
+            color: #0A0A0A;
+            border-color: #94CDFF;
+        }
+
+        .category-badge.corners {
+            background: #FEC7F0;
+            color: #0A0A0A;
+            border-color: #FEC7F0;
+        }
+
+        .category-badge.elevation {
+            background: #BDE56C;
+            color: #1F2917;
+            border-color: #BDE56C;
+        }
+
+        [data-theme="dark"] .category-badge.color {
+            background: #062822;
+            color: #0AC7B4;
+            border-color: #062822;
+        }
+
+        [data-theme="dark"] .category-badge.typography {
+            background: #331B00;
+            color: #FF990A;
+            border-color: #331B00;
+        }
+
+        [data-theme="dark"] .category-badge.spacing {
+            background: #10233D;
+            color: #52A8FF;
+            border-color: #10233D;
+        }
+
+        [data-theme="dark"] .category-badge.corners {
+            background: #3A1726;
+            color: #F75F8F;
+            border-color: #3A1726;
+        }
+
+        [data-theme="dark"] .category-badge.elevation {
+            background: #1F2917;
+            color: #BDEE63;
+            border-color: #1F2917;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #02514E;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .auth-form {
+                flex-direction: column;
+            }
+            
+            .filters {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h2>Design Token Manager</h2>
+            <p>Create, manage, and organize your design tokens</p>
+        </div>
+
+        <!-- Authentication Section -->
+        <div class="auth-section" id="auth-section">
+            <div class="auth-form">
+                <input type="email" id="login-email" placeholder="Email" value="tokenadmin@example.com">
+                <input type="password" id="login-password" placeholder="Password" value="admin123">
+                <button class="btn btn-primary" onclick="login()">Login</button>
+                <button class="btn btn-secondary" onclick="logout()">Logout</button>
+            </div>
+            <div id="auth-message"></div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar - Add Token Form -->
+            <div class="sidebar">
+                <h3>Add New Token</h3>
+                <form id="token-form">
+                    <div class="form-group">
+                        <label for="token-name">Name *</label>
+                        <input type="text" id="token-name" required placeholder="e.g., primary-blue">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="token-category">Category *</label>
+                        <select id="token-category" required>
+                            <option value="">Select Category</option>
+                            <option value="color">Color</option>
+                            <option value="typography">Typography</option>
+                            <option value="spacing">Spacing</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="token-value">Value *</label>
+                        <input type="text" id="token-value" required placeholder="e.g., #007bff">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="token-description">Description</label>
+                        <textarea id="token-description" placeholder="Describe what this token is used for..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="token-tags">Tags (comma-separated)</label>
+                        <input type="text" id="token-tags" placeholder="primary, brand, ui">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Create Token</button>
+                </form>
+
+                <!-- Import/Export Section -->
+                <div class="import-export-section">
+                    <h4>📁 Import/Export JSON</h4>
+                    
+                    <div class="file-input">
+                        <label for="json-file">Upload JSON File:</label>
+                        <input type="file" id="json-file" accept=".json">
+                    </div>
+                    
+                    <button class="btn btn-secondary" onclick="uploadTokens()" style="width: 100%; margin-bottom: 10px; font-weight: bold;">📁 Upload Tokens</button>
+                    <button class="btn btn-primary" onclick="exportTokens()" style="width: 100%; font-weight: bold;">📤 Export as JSON</button>
+                    
+                    <div id="upload-message"></div>
+                </div>
+            </div>
+
+            <!-- Main Panel - Display Tokens -->
+            <div class="main-panel">
+                <div class="panel-header">
+                    <h3>Design Tokens</h3>
+                    <button class="btn btn-secondary" onclick="refreshTokens()">Refresh</button>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-grid" id="stats-grid">
+                    <!-- Stats will be populated here -->
+                </div>
+
+                <!-- Filters -->
+                <div class="filters">
+                    <input type="text" id="search-input" placeholder="Search tokens...">
+                    <select id="category-filter">
+                        <option value="">All Categories</option>
+                        <option value="color">Color</option>
+                        <option value="typography">Typography</option>
+                        <option value="spacing">Spacing</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+                    <button class="btn btn-secondary" onclick="clearFilters()">Clear</button>
+                </div>
+
+                <!-- Tokens Table -->
+                <div id="tokens-container">
+                    <div class="loading">Loading tokens...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Token Detail Modal -->
+    <div id="token-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modal-content">
+                <!-- Modal content will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let authToken = localStorage.getItem('authToken');
+        let currentUser = null;
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+            loadTokens();
+            loadStats();
+        });
+
+        // Authentication functions
+        async function login() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const messageDiv = document.getElementById('auth-message');
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    authToken = data.token;
+                    currentUser = data.user;
+                    localStorage.setItem('authToken', authToken);
+                    showMessage('Login successful!', 'success');
+                    loadTokens();
+                    loadStats();
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Login failed. Please try again.', 'error');
+            }
+        }
+
+        function logout() {
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('authToken');
+            showMessage('Logged out successfully.', 'success');
+            loadTokens();
+            loadStats();
+        }
+
+        function checkAuth() {
+            if (authToken) {
+                fetch('/api/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        logout();
+                    }
+                })
+                .catch(() => {
+                    logout();
+                });
+            }
+        }
+
+        // Token management functions
+        async function loadTokens() {
+            const container = document.getElementById('tokens-container');
+            
+            if (!authToken) {
+                container.innerHTML = '<div class="loading">Please log in to view tokens</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/tokens', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Raw API response:', data);
+                    
+                    // Handle both array and object responses
+                    let tokens;
+                    if (Array.isArray(data)) {
+                        tokens = data;
+                    } else if (data.tokens && Array.isArray(data.tokens)) {
+                        tokens = data.tokens;
+                    } else {
+                        console.error('Invalid API response format:', data);
+                        container.innerHTML = '<div class="error">Invalid API response format</div>';
+                        return;
+                    }
+                    
+                    displayTokens(tokens);
+                } else {
+                    container.innerHTML = '<div class="error">Failed to load tokens</div>';
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error loading tokens</div>';
+            }
+        }
+
+        function displayTokens(tokens) {
+            const container = document.getElementById('tokens-container');
+            
+            if (tokens.length === 0) {
+                container.innerHTML = '<div class="loading">No tokens found</div>';
+                return;
+            }
+
+            const tableHTML = `
+                <table class="tokens-table">
+                    <thead>
+                        <tr>
+                            <th>Example</th>
+                            <th>Token</th>
+                            <th>Value</th>
+                            <th>Category</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${tokens.map(token => `
+                            <tr>
+                                <td>
+                                    ${generateTokenExample(token)}
+                                </td>
+                                <td>
+                                    <div class="token-name">${token.name}</div>
+                                    ${token.description ? `<div style="color: #718096; font-size: 12px; margin-top: 4px;">${token.description}</div>` : ''}
+                                </td>
+                                <td>
+                                    <div class="token-value-container">
+                                        <span class="token-value">${token.value}</span>
+                                        <button class="token-value-copy-btn" onclick="copyTokenValue(this)" title="Copy value">
+                                            <i data-lucide="copy" style="width: 12px; height: 12px;"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                                <td>
+                                    ${generateCategoryBadge(token.category)}
+                                </td>
+                                <td>
+                                    <button class="btn btn-secondary btn-sm" onclick="viewToken('${token._id}')">View</button>
+                                    <button class="btn btn-primary-outline btn-sm" onclick="editToken('${token._id}')">Edit</button>
+                                    <button class="btn btn-danger btn-sm" onclick="deleteToken('${token._id}')">Delete</button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+
+            container.innerHTML = tableHTML;
+            
+            // Initialize Lucide icons for category badges
+            lucide.createIcons();
+        }
+
+        function generateTokenExample(token) {
+            switch (token.category) {
+                case 'color':
+                    return `<div class="token-example" style="background-color: ${token.value};"></div>`;
+                case 'typography':
+                    return `<div style="font-size: ${token.value}; line-height: 1; color: #333;">Aa</div>`;
+                case 'spacing':
+                    const size = parseInt(token.value) || 16;
+                    return `<div class="token-example" style="width: ${Math.min(size, 40)}px; height: 8px; background: #718096;"></div>`;
+                default:
+                    return `<div class="token-example" style="background: #f7fafc; border: 2px dashed #cbd5e0;"></div>`;
+            }
+        }
+
+        function generateCategoryBadge(category) {
+            // Define category icons and labels
+            const categoryConfig = {
+                color: { icon: 'palette', label: 'Color' },
+                typography: { icon: 'type', label: 'Typography' },
+                spacing: { icon: 'move', label: 'Spacing' },
+                elevation: { icon: 'layers', label: 'Elevation' },
+                corners: { icon: 'corner-down-right', label: 'Corners' }
+            };
+
+            const config = categoryConfig[category] || { icon: 'circle', label: category };
+            
+            return `
+                <span class="category-badge ${category}">
+                    <i data-lucide="${config.icon}"></i>
+                    <span>${config.label}</span>
+                </span>
+            `;
+        }
+
+        async function loadStats() {
+            if (!authToken) return;
+
+            try {
+                const response = await fetch('/api/tokens', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('loadStats raw response:', data);
+                    
+                    // Handle both array and object responses
+                    let tokens;
+                    if (Array.isArray(data)) {
+                        tokens = data;
+                    } else if (data.tokens && Array.isArray(data.tokens)) {
+                        tokens = data.tokens;
+                    } else {
+                        console.error('Invalid API response format in loadStats:', data);
+                        return;
+                    }
+                    
+                    displayStats(tokens);
+                }
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        function displayStats(tokens) {
+            const statsGrid = document.getElementById('stats-grid');
+            
+            const categoryCounts = tokens.reduce((acc, token) => {
+                acc[token.category] = (acc[token.category] || 0) + 1;
+                return acc;
+            }, {});
+            
+            const statsHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${tokens.length}</div>
+                    <div class="stat-label">Total Tokens</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${categoryCounts.color || 0}</div>
+                    <div class="stat-label">Colors</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${categoryCounts.typography || 0}</div>
+                    <div class="stat-label">Typography</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${categoryCounts.spacing || 0}</div>
+                    <div class="stat-label">Spacing</div>
+                </div>
+            `;
+            
+            statsGrid.innerHTML = statsHTML;
+        }
+
+        // Form handling
+        document.getElementById('token-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!authToken) {
+                showMessage('Please log in to create tokens', 'error');
+                return;
+            }
+
+            const formData = {
+                name: document.getElementById('token-name').value,
+                category: document.getElementById('token-category').value,
+                value: document.getElementById('token-value').value,
+                description: document.getElementById('token-description').value,
+                tags: document.getElementById('token-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag)
+            };
+
+            try {
+                const response = await fetch('/api/tokens', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage('Token created successfully!', 'success');
+                    this.reset();
+                    loadTokens();
+                    loadStats();
+                } else {
+                    showMessage(data.error || 'Failed to create token', 'error');
+                }
+            } catch (error) {
+                showMessage('Error creating token', 'error');
+            }
+        });
+
+        // Import/Export functions
+        async function uploadTokens() {
+            const fileInput = document.getElementById('json-file');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showMessage('Please select a JSON file', 'error');
+                return;
+            }
+
+            if (!authToken) {
+                showMessage('Please log in to upload tokens', 'error');
+                return;
+            }
+
+            try {
+                const text = await file.text();
+                const jsonData = JSON.parse(text);
+                
+                if (!jsonData.tokens || !Array.isArray(jsonData.tokens)) {
+                    showMessage('Invalid JSON format. Expected { "tokens": [...] }', 'error');
+                    return;
+                }
+
+                const response = await fetch('/api/tokens/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage(`Upload complete! ${data.results.success.length} created, ${data.results.skipped.length} skipped, ${data.results.errors.length} errors`, 'success');
+                    fileInput.value = '';
+                    loadTokens();
+                    loadStats();
+                } else {
+                    showMessage(data.error || 'Upload failed', 'error');
+                }
+            } catch (error) {
+                showMessage('Error uploading tokens: ' + error.message, 'error');
+            }
+        }
+
+        async function exportTokens() {
+            if (!authToken) {
+                showMessage('Please log in to export tokens', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/tokens?limit=1000', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('exportTokens raw response:', data);
+                    
+                    // Handle both array and object responses
+                    let tokens;
+                    if (Array.isArray(data)) {
+                        tokens = data;
+                    } else if (data.tokens && Array.isArray(data.tokens)) {
+                        tokens = data.tokens;
+                    } else {
+                        console.error('Invalid API response format in exportTokens:', data);
+                        showMessage('Invalid API response format', 'error');
+                        return;
+                    }
+                    
+                    const exportData = {
+                        tokens: tokens.map(token => ({
+                            name: token.name,
+                            category: token.category,
+                            value: token.value,
+                            description: token.description || '',
+                            tags: token.tags || []
+                        }))
+                    };
+
+                    const jsonString = JSON.stringify(exportData, null, 2);
+                    const blob = new Blob([jsonString], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `design-tokens-${new Date().toISOString().split('T')[0]}.json`;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                    
+                    showMessage(`Exported ${exportData.tokens.length} tokens successfully!`, 'success');
+                } else {
+                    showMessage('Failed to export tokens', 'error');
+                }
+            } catch (error) {
+                showMessage('Error exporting tokens', 'error');
+            }
+        }
+
+        // Filter functions
+        function applyFilters() {
+            const search = document.getElementById('search-input').value;
+            const category = document.getElementById('category-filter').value;
+            
+            const params = new URLSearchParams();
+            if (search) params.append('search', search);
+            if (category) params.append('category', category);
+            
+            loadFilteredTokens(params.toString());
+        }
+
+        function clearFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('category-filter').value = '';
+            loadTokens();
+        }
+
+        async function loadFilteredTokens(queryString) {
+            if (!authToken) return;
+
+            try {
+                const response = await fetch(`/api/tokens?${queryString}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('loadFilteredTokens raw response:', data);
+                    
+                    // Handle both array and object responses
+                    let tokens;
+                    if (Array.isArray(data)) {
+                        tokens = data;
+                    } else if (data.tokens && Array.isArray(data.tokens)) {
+                        tokens = data.tokens;
+                    } else {
+                        console.error('Invalid API response format in loadFilteredTokens:', data);
+                        return;
+                    }
+                    
+                    displayTokens(tokens);
+                }
+            } catch (error) {
+                console.error('Failed to load filtered tokens:', error);
+            }
+        }
+
+        // Token actions
+        async function viewToken(id) {
+            if (!authToken) return;
+
+            try {
+                const response = await fetch(`/api/tokens/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const token = await response.json();
+                    showTokenModal(token);
+                }
+            } catch (error) {
+                showMessage('Failed to load token details', 'error');
+            }
+        }
+
+        async function deleteToken(id) {
+            if (!authToken || !confirm('Are you sure you want to delete this token?')) return;
+
+            try {
+                const response = await fetch(`/api/tokens/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    showMessage('Token deleted successfully', 'success');
+                    loadTokens();
+                    loadStats();
+                } else {
+                    showMessage('Failed to delete token', 'error');
+                }
+            } catch (error) {
+                showMessage('Error deleting token', 'error');
+            }
+        }
+
+        function editToken(id) {
+            showMessage('Edit functionality coming soon!', 'success');
+        }
+
+        // Modal functions
+        function showTokenModal(token) {
+            const modal = document.getElementById('token-modal');
+            const content = document.getElementById('modal-content');
+            
+            content.innerHTML = `
+                <h2>${token.name}</h2>
+                <p><strong>Category:</strong> ${token.category}</p>
+                <p><strong>Value:</strong> <code>${token.value}</code></p>
+                <p><strong>Description:</strong> ${token.description || 'No description'}</p>
+                
+                ${token.tags && token.tags.length > 0 ? `
+                    <p><strong>Tags:</strong> ${token.tags.join(', ')}</p>
+                ` : ''}
+                
+                <div style="margin-top: 20px;">
+                    <strong>Preview:</strong>
+                    <div style="margin-top: 10px;">
+                        ${generateTokenExample(token)}
+                    </div>
+                </div>
+            `;
+            
+            modal.style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('token-modal').style.display = 'none';
+        }
+
+        // Utility functions
+        function showMessage(message, type) {
+            const messageDiv = document.getElementById('auth-message');
+            messageDiv.innerHTML = `<div class="${type}">${message}</div>`;
+            setTimeout(() => {
+                messageDiv.innerHTML = '';
+            }, 5000);
+        }
+
+        function refreshTokens() {
+            loadTokens();
+            loadStats();
+        }
+
+        // Copy functionality
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showMessage('Copied to clipboard!', 'success');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                showMessage('Failed to copy to clipboard', 'error');
+            });
+        }
+
+        function copyTokenValue(button) {
+            const tokenValue = button.closest('.token-value-container').querySelector('.token-value').textContent;
+            copyToClipboard(tokenValue);
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('token-modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Token Update</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { padding: 10px 15px; margin: 5px; }
+        input { padding: 5px; margin: 5px; width: 200px; }
+    </style>
+</head>
+<body>
+    <h1>Test Token Update Functionality</h1>
+    
+    <div class="test-section">
+        <h2>Step 1: Login</h2>
+        <input type="email" id="login-email" placeholder="Email" value="tokenadmin@example.com">
+        <input type="password" id="login-password" placeholder="Password" value="admin123">
+        <button onclick="login()">Login</button>
+        <div id="login-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 2: Get Token List</h2>
+        <button onclick="getTokens()">Get Tokens</button>
+        <div id="token-list"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 3: Update Token</h2>
+        <input type="text" id="token-id" placeholder="Token ID">
+        <input type="text" id="token-name" placeholder="Token Name" value="test-color">
+        <input type="text" id="token-value" placeholder="New Value" value="#ff0000">
+        <button onclick="updateToken()">Update Token</button>
+        <div id="update-status"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Step 4: Verify Update</h2>
+        <button onclick="verifyUpdate()">Verify Update</button>
+        <div id="verify-status"></div>
+    </div>
+
+    <script>
+        let authToken = null;
+
+        async function login() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const statusDiv = document.getElementById('login-status');
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+                if (response.ok) {
+                    authToken = data.token;
+                    statusDiv.innerHTML = '<span class="success">✅ Login successful</span>';
+                } else {
+                    statusDiv.innerHTML = `<span class="error">❌ Login failed: ${data.error}</span>`;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<span class="error">❌ Login error: ${error.message}</span>`;
+            }
+        }
+
+        async function getTokens() {
+            if (!authToken) {
+                document.getElementById('token-list').innerHTML = '<span class="error">❌ Please login first</span>';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/tokens?limit=10', {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await response.json();
+                console.log('Tokens response:', data);
+
+                let tokens;
+                if (Array.isArray(data)) {
+                    tokens = data;
+                } else if (data.tokens && Array.isArray(data.tokens)) {
+                    tokens = data.tokens;
+                } else {
+                    document.getElementById('token-list').innerHTML = '<span class="error">❌ Invalid response format</span>';
+                    return;
+                }
+
+                const tokenListDiv = document.getElementById('token-list');
+                tokenListDiv.innerHTML = '<h3>First 10 tokens:</h3>';
+                
+                tokens.forEach((token, index) => {
+                    tokenListDiv.innerHTML += `
+                        <div>
+                            <strong>${index + 1}.</strong> ${token.name} (${token.category}): ${token.value}
+                            <button onclick="selectToken('${token._id}', '${token.name}')">Select</button>
+                        </div>
+                    `;
+                });
+            } catch (error) {
+                document.getElementById('token-list').innerHTML = `<span class="error">❌ Error: ${error.message}</span>`;
+            }
+        }
+
+        function selectToken(id, name) {
+            document.getElementById('token-id').value = id;
+            document.getElementById('token-name').value = name;
+        }
+
+        async function updateToken() {
+            if (!authToken) {
+                document.getElementById('update-status').innerHTML = '<span class="error">❌ Please login first</span>';
+                return;
+            }
+
+            const tokenId = document.getElementById('token-id').value;
+            const name = document.getElementById('token-name').value;
+            const value = document.getElementById('token-value').value;
+
+            if (!tokenId || !name || !value) {
+                document.getElementById('update-status').innerHTML = '<span class="error">❌ Please fill all fields</span>';
+                return;
+            }
+
+            try {
+                const updateData = {
+                    name: name,
+                    category: 'color',
+                    value: value,
+                    description: 'Updated via test page',
+                    tags: ['test'],
+                    status: 'active',
+                    theme: 'both',
+                    lightValue: value,
+                    darkValue: value
+                };
+
+                console.log('Updating token with data:', updateData);
+
+                const response = await fetch(`/api/tokens/${tokenId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(updateData)
+                });
+
+                const data = await response.json();
+                console.log('Update response:', data);
+
+                if (response.ok) {
+                    document.getElementById('update-status').innerHTML = '<span class="success">✅ Token updated successfully!</span>';
+                } else {
+                    document.getElementById('update-status').innerHTML = `<span class="error">❌ Update failed: ${data.error}</span>`;
+                }
+            } catch (error) {
+                document.getElementById('update-status').innerHTML = `<span class="error">❌ Update error: ${error.message}</span>`;
+            }
+        }
+
+        async function verifyUpdate() {
+            if (!authToken) {
+                document.getElementById('verify-status').innerHTML = '<span class="error">❌ Please login first</span>';
+                return;
+            }
+
+            const tokenId = document.getElementById('token-id').value;
+            if (!tokenId) {
+                document.getElementById('verify-status').innerHTML = '<span class="error">❌ Please select a token first</span>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/tokens/${tokenId}`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+
+                const data = await response.json();
+                console.log('Verify response:', data);
+
+                if (response.ok) {
+                    document.getElementById('verify-status').innerHTML = `
+                        <span class="success">✅ Token verified:</span><br>
+                        <strong>Name:</strong> ${data.name}<br>
+                        <strong>Value:</strong> ${data.value}<br>
+                        <strong>Category:</strong> ${data.category}<br>
+                        <strong>Description:</strong> ${data.description || 'None'}
+                    `;
+                } else {
+                    document.getElementById('verify-status').innerHTML = `<span class="error">❌ Verification failed: ${data.error}</span>`;
+                }
+            } catch (error) {
+                document.getElementById('verify-status').innerHTML = `<span class="error">❌ Verification error: ${error.message}</span>`;
+            }
+        }
+    </script>
+</body>
+</html> 

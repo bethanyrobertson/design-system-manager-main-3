@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Main App Token Loading</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .token { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .test-token { background: #ffeb3b; border-color: #ffc107; }
+        .error { color: red; }
+        .success { color: green; }
+        .info { color: blue; }
+        .warning { color: orange; }
+        .raw-data { background: #f5f5f5; padding: 10px; margin: 10px 0; font-family: monospace; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>Debug Main App Token Loading</h1>
+    <div id="status">Loading...</div>
+    <div id="tokens"></div>
+
+    <script>
+        async function debugMainAppLoading() {
+            const statusDiv = document.getElementById('status');
+            const tokensDiv = document.getElementById('tokens');
+            
+            try {
+                // Step 1: Check if we have an auth token
+                const authToken = localStorage.getItem('authToken');
+                statusDiv.innerHTML += '<div class="info">Step 1: Checking auth token...</div>';
+                
+                if (!authToken) {
+                    statusDiv.innerHTML += '<div class="error">❌ No auth token found in localStorage</div>';
+                    return;
+                }
+                
+                statusDiv.innerHTML += '<div class="success">✅ Auth token found</div>';
+                
+                // Step 2: Load tokens using the same API call as main app
+                statusDiv.innerHTML += '<div class="info">Step 2: Loading tokens from API...</div>';
+                
+                const response = await fetch('/api/tokens?limit=200', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    statusDiv.innerHTML += `<div class="error">❌ API error: ${response.status} ${response.statusText}</div>`;
+                    return;
+                }
+                
+                const data = await response.json();
+                statusDiv.innerHTML += `<div class="success">✅ API response received</div>`;
+                
+                // Step 2.5: Debug the raw response
+                statusDiv.innerHTML += '<div class="info">Step 2.5: Raw API response:</div>';
+                statusDiv.innerHTML += `<div class="raw-data">${JSON.stringify(data, null, 2)}</div>`;
+                
+                // Check if data is an array
+                if (!Array.isArray(data)) {
+                    statusDiv.innerHTML += `<div class="error">❌ API response is not an array. Type: ${typeof data}</div>`;
+                    if (data && typeof data === 'object') {
+                        statusDiv.innerHTML += `<div class="info">Response keys: ${Object.keys(data).join(', ')}</div>`;
+                    }
+                    return;
+                }
+                
+                statusDiv.innerHTML += `<div class="success">✅ API response: ${data.length} tokens</div>`;
+                
+                // Step 3: Check if test-color is in the response
+                const testToken = data.find(t => t.name === 'test-color');
+                if (testToken) {
+                    statusDiv.innerHTML += `<div class="success">✅ Found test-color: ${testToken.value}</div>`;
+                } else {
+                    statusDiv.innerHTML += '<div class="error">❌ test-color not found in API response</div>';
+                }
+                
+                // Step 4: Sort tokens like the main app does
+                statusDiv.innerHTML += '<div class="info">Step 4: Sorting tokens...</div>';
+                
+                const categoryOrder = ['color', 'typography', 'spacing', 'elevation', 'corners'];
+                
+                const sortedTokens = data.sort((a, b) => {
+                    const aIndex = categoryOrder.indexOf(a.category);
+                    const bIndex = categoryOrder.indexOf(b.category);
+                    
+                    if (aIndex !== bIndex) {
+                        return aIndex - bIndex;
+                    }
+                    
+                    // Sort by numerical value within category
+                    const aValue = parseFloat(a.value) || 0;
+                    const bValue = parseFloat(b.value) || 0;
+                    return aValue - bValue;
+                });
+                
+                statusDiv.innerHTML += `<div class="success">✅ Sorted ${sortedTokens.length} tokens</div>`;
+                
+                // Step 5: Find test-color in sorted list
+                const sortedTestToken = sortedTokens.find(t => t.name === 'test-color');
+                if (sortedTestToken) {
+                    const position = sortedTokens.findIndex(t => t.name === 'test-color') + 1;
+                    statusDiv.innerHTML += `<div class="success">✅ test-color found at position ${position} after sorting</div>`;
+                } else {
+                    statusDiv.innerHTML += '<div class="error">❌ test-color not found after sorting</div>';
+                }
+                
+                // Step 6: Display first 10 tokens to see what's showing
+                statusDiv.innerHTML += '<div class="info">Step 6: First 10 tokens in sorted list:</div>';
+                
+                const first10 = sortedTokens.slice(0, 10);
+                first10.forEach((token, index) => {
+                    const isTest = token.name === 'test-color';
+                    const className = isTest ? 'test-token' : 'token';
+                    tokensDiv.innerHTML += `
+                        <div class="${className}">
+                            ${index + 1}. ${token.name} (${token.category}): ${token.value}
+                            ${isTest ? ' <strong>← THIS IS OUR TEST TOKEN</strong>' : ''}
+                        </div>
+                    `;
+                });
+                
+                // Step 7: Check if there are more tokens
+                if (sortedTokens.length > 10) {
+                    statusDiv.innerHTML += `<div class="warning">⚠️ There are ${sortedTokens.length - 10} more tokens not shown</div>`;
+                }
+                
+            } catch (error) {
+                statusDiv.innerHTML += `<div class="error">❌ Error: ${error.message}</div>`;
+                console.error('Debug error:', error);
+            }
+        }
+        
+        debugMainAppLoading();
+    </script>
+</body>
+</html> 

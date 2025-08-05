@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Main App Logic</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .token { margin: 10px 0; padding: 10px; border: 1px solid #ccc; }
+        .test-token { background: #ffeb3b; border-color: #ffc107; }
+        .error { color: red; }
+        .success { color: green; }
+        .info { color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Test Main App Token Logic</h1>
+    <div id="status">Loading...</div>
+    <div id="tokens"></div>
+
+    <script>
+        async function testMainAppLogic() {
+            const statusDiv = document.getElementById('status');
+            const tokensDiv = document.getElementById('tokens');
+            
+            try {
+                // Login
+                statusDiv.innerHTML = 'Logging in...';
+                const loginResponse = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'tokenadmin@example.com',
+                        password: 'admin123'
+                    })
+                });
+                
+                const loginData = await loginResponse.json();
+                if (!loginData.token) {
+                    statusDiv.innerHTML = '<span class="error">Login failed</span>';
+                    return;
+                }
+                
+                statusDiv.innerHTML = '<span class="success">Login successful</span>';
+                
+                // Get tokens (same as main app)
+                statusDiv.innerHTML += '<br>Loading tokens...';
+                const tokensResponse = await fetch('/api/tokens?limit=200', {
+                    headers: { 'Authorization': `Bearer ${loginData.token}` }
+                });
+                
+                const tokensData = await tokensResponse.json();
+                statusDiv.innerHTML += `<br><span class="success">Loaded ${tokensData.tokens.length} tokens</span>`;
+                
+                // Test the main app's sorting function
+                const sortedTokens = sortTokensByCategoryAndValue(tokensData.tokens);
+                statusDiv.innerHTML += `<br><span class="info">After sorting: ${sortedTokens.length} tokens</span>`;
+                
+                // Display first 20 tokens to see if test-color is there
+                tokensDiv.innerHTML = '<h2>First 20 Tokens (After Sorting):</h2>';
+                sortedTokens.slice(0, 20).forEach((token, index) => {
+                    const isTestToken = token.name === 'test-color';
+                    const div = document.createElement('div');
+                    div.className = `token ${isTestToken ? 'test-token' : ''}`;
+                    div.innerHTML = `
+                        <strong>${index + 1}. ${token.name}</strong> (${token.category}): ${token.value}
+                        ${token.description ? `<br><small>${token.description}</small>` : ''}
+                    `;
+                    tokensDiv.appendChild(div);
+                });
+                
+                // Check if test-color is in the sorted list
+                const testTokenIndex = sortedTokens.findIndex(t => t.name === 'test-color');
+                if (testTokenIndex !== -1) {
+                    statusDiv.innerHTML += `<br><span class="success">✅ test-color found at position ${testTokenIndex + 1}</span>`;
+                } else {
+                    statusDiv.innerHTML += `<br><span class="error">❌ test-color not found in sorted list</span>`;
+                }
+                
+                // Show all color tokens
+                const colorTokens = sortedTokens.filter(t => t.category === 'color');
+                statusDiv.innerHTML += `<br><span class="info">Color tokens: ${colorTokens.length}</span>`;
+                
+                tokensDiv.innerHTML += '<h2>All Color Tokens:</h2>';
+                colorTokens.forEach((token, index) => {
+                    const isTestToken = token.name === 'test-color';
+                    const div = document.createElement('div');
+                    div.className = `token ${isTestToken ? 'test-token' : ''}`;
+                    div.innerHTML = `
+                        <strong>${index + 1}. ${token.name}</strong>: ${token.value}
+                        ${token.description ? `<br><small>${token.description}</small>` : ''}
+                    `;
+                    tokensDiv.appendChild(div);
+                });
+                
+            } catch (error) {
+                console.error('Error:', error);
+                statusDiv.innerHTML = `<span class="error">Error: ${error.message}</span>`;
+            }
+        }
+        
+        // Copy the main app's sorting function
+        function sortTokensByCategoryAndValue(tokens) {
+            // Define category order
+            const categoryOrder = ['color', 'typography', 'spacing', 'elevation', 'corners'];
+            
+            return tokens.sort((a, b) => {
+                // First sort by category
+                const aIndex = categoryOrder.indexOf(a.category);
+                const bIndex = categoryOrder.indexOf(b.category);
+                
+                if (aIndex !== bIndex) {
+                    return aIndex - bIndex;
+                }
+                
+                // Within the same category, sort by numerical value
+                const aValue = extractNumericValue(a.value);
+                const bValue = extractNumericValue(b.value);
+                
+                if (aValue !== null && bValue !== null) {
+                    return aValue - bValue;
+                }
+                
+                // If not numerical, sort alphabetically by name
+                return a.name.localeCompare(b.name);
+            });
+        }
+
+        function extractNumericValue(value) {
+            // Extract numeric value from token value
+            const match = value.match(/(\d+(?:\.\d+)?)/);
+            return match ? parseFloat(match[1]) : null;
+        }
+        
+        // Run when page loads
+        testMainAppLogic();
+    </script>
+</body>
+</html> 

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Form Test</title>
+</head>
+<body>
+    <h1>Token Update Test</h1>
+    
+    <form id="test-form">
+        <input type="hidden" id="token-id" value="68853e85c3e0abcf5cfc90a9">
+        <div>
+            <label>Name:</label>
+            <input type="text" id="token-name" value="test-color">
+        </div>
+        <div>
+            <label>Category:</label>
+            <select id="token-category">
+                <option value="color" selected>Color</option>
+                <option value="typography">Typography</option>
+            </select>
+        </div>
+        <div>
+            <label>Value:</label>
+            <input type="text" id="token-value" value="#00ff00">
+        </div>
+        <button type="submit">Update Token</button>
+    </form>
+    
+    <div id="result"></div>
+    
+    <script>
+        document.getElementById('test-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            console.log('Form submitted!');
+            
+            const formData = {
+                name: document.getElementById('token-name').value,
+                category: document.getElementById('token-category').value,
+                value: document.getElementById('token-value').value
+            };
+            
+            console.log('Form data:', formData);
+            
+            try {
+                const response = await fetch('/api/tokens/68853e85c3e0abcf5cfc90a9', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + localStorage.getItem('authToken')
+                    },
+                    body: JSON.stringify(formData)
+                });
+                
+                console.log('Response status:', response.status);
+                const data = await response.json();
+                console.log('Response data:', data);
+                
+                document.getElementById('result').innerHTML = 
+                    `<p>Status: ${response.status}</p><p>Response: ${JSON.stringify(data, null, 2)}</p>`;
+                    
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = `<p>Error: ${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html> 

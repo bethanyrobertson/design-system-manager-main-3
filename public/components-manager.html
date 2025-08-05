@@ -1,0 +1,4688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Component Library Manager</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --background: #FBFAF4;
+            --foreground: 222.2 84% 4.9%;
+
+            --card: #FCFCF9;
+            --card-foreground: 222.2 84% 4.9%;
+
+            --popover: #FCFCF9;
+            --popover-foreground: 222.2 84% 4.9%;
+
+            --primary: #A78BFA; /* Purple */
+            --primary-foreground: 0 0% 100%;
+
+            --secondary: 25 95% 53%; /* Orange */
+            --secondary-foreground: 0 0% 100%;
+
+            --muted: #FBFAF4;
+            --muted-foreground: 215.4 16.3% 46.9%;
+
+            --accent: #A78BFA; /* Purple accent */
+            --accent-foreground: 0 0% 100%;
+
+            --destructive: 0 84.2% 60.2%;
+            --destructive-foreground: 0 0% 100%;
+
+            --border: 214.3 31.8% 91.4%;
+            --input: #FBFAF4;
+            --ring: 222.2 84% 4.9%;
+
+            --radius: 0.5rem;
+
+            /* Legacy support - keeping our existing variable names */
+            --bg-primary: #FBFAF4;
+            --bg-secondary: #FBFAF4;
+            --text-primary: #333;
+            --text-secondary: #666;
+            --border-color: #e1e5e9;
+            --accent-color: #A78BFA;
+            --accent-hover: #8B5CF6;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --card-bg: #FCFCF9;
+            --input-bg: #FBFAF4;
+            --code-bg: #FBFAF4;
+            --danger-color: #dc3545;
+            --danger-hover: #c82333;
+
+            /* Spacing tokens based on 8px scale */
+            --spacing-1: 8px;
+            --spacing-2: 16px;
+            --spacing-3: 24px;
+            --spacing-4: 32px;
+            --spacing-5: 40px;
+            --spacing-6: 48px;
+            --spacing-7: 56px;
+            --spacing-8: 64px;
+            --spacing-9: 72px;
+            --spacing-10: 80px;
+            --spacing-11: 88px;
+            --spacing-12: 96px;
+            --spacing-13: 104px;
+            --spacing-14: 112px;
+            --spacing-15: 120px;
+            --spacing-16: 128px;
+            --spacing-17: 136px;
+            --spacing-18: 144px;
+            --spacing-19: 152px;
+            --spacing-20: 160px;
+        }
+
+        [data-theme="dark"] {
+            --background: #000C0E;
+            --foreground: 210 40% 98%;
+
+            --card: #031B20;
+            --card-foreground: 210 40% 98%;
+
+            --popover: #031B20;
+            --popover-foreground: 210 40% 98%;
+
+            --primary: #C4B5FD; /* Purple */
+            --primary-foreground: 222.2 84% 4.9%;
+
+            --secondary: 25 95% 53%; /* Orange */
+            --secondary-foreground: 222.2 84% 4.9%;
+
+            --muted: 217.2 32.6% 17.5%;
+            --muted-foreground: 215 20.2% 65.1%;
+
+            --accent: #C4B5FD; /* Purple accent */
+            --accent-foreground: 0 0% 100%;
+
+            --destructive: 0 62.8% 30.6%;
+            --destructive-foreground: 210 40% 98%;
+
+            --border: 217.2 32.6% 17.5%;
+            --input: 217.2 32.6% 17.5%;
+            --ring: 212.7 26.8% 83.9%;
+
+            --radius: 0.5rem;
+
+            /* Legacy support - keeping our existing variable names */
+            --bg-primary: #000C0E;
+            --bg-secondary: #000C0E;
+            --text-primary: #EAEEEF;
+            --text-secondary: #b0b0b0;
+            --border-color: #404040;
+            --accent-color: #C4B5FD;
+            --accent-hover: #A78BFA;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            --card-bg: #031B20;
+            --input-bg: #1f2121;
+            --code-bg: #1E1E1E;
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--background);
+            min-height: 100vh;
+            color: hsl(var(--foreground));
+            line-height: 1.6;
+        }
+
+        /* Smooth transitions for theme changes */
+        * {
+            transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                        color 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                        border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                        box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Utility classes */
+        .backface-hidden {
+            backface-visibility: hidden;
+        }
+
+        /* Apply JetBrains Mono to all headers */
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar-nav {
+            width: 280px;
+            background: var(--card);
+            border-right: 1px solid hsl(var(--border));
+            padding: var(--spacing-3);
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .main-dashboard {
+            flex: 1;
+            margin-left: 280px;
+            padding: var(--spacing-4);
+        }
+
+        .dashboard-header {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: var(--spacing-3);
+            margin-bottom: var(--spacing-4);
+        }
+
+        .dashboard-header h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: hsl(var(--foreground));
+            margin-bottom: var(--spacing-1);
+        }
+
+        .dashboard-header p {
+            color: hsl(var(--muted-foreground));
+            font-size: 1rem;
+        }
+
+        .theme-toggle-container {
+            flex-shrink: 0;
+        }
+
+        .theme-toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .theme-toggle-switch:hover {
+            transform: scale(1.1);
+        }
+
+        .toggle-track {
+            position: relative;
+            width: 48px;
+            height: 24px;
+            background: #e5e7eb;
+            border-radius: 12px;
+            transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .sun-icon, .moon-icon {
+            width: 16px;
+            height: 16px;
+            transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .sun-icon {
+            color: #000000;
+            transform: scale(1) rotate(0deg);
+        }
+
+        .moon-icon {
+            color: #A1A1AA;
+            transform: scale(0.75) rotate(12deg);
+        }
+
+        .toggle-thumb {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        [data-theme="dark"] .toggle-track {
+            background: #374151;
+        }
+
+        [data-theme="dark"] .toggle-thumb {
+            transform: translateX(24px);
+        }
+
+        [data-theme="dark"] .sun-icon {
+            color: #A1A1AA;
+            transform: scale(0.75) rotate(12deg);
+        }
+
+        [data-theme="dark"] .moon-icon {
+            color: #EAEEEF;
+            transform: scale(1) rotate(0deg);
+        }
+
+        .theme-toggle-switch:hover .toggle-track {
+            opacity: 0.9;
+        }
+
+        .theme-toggle-switch:hover .toggle-thumb {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: black;
+            margin-bottom: var(--spacing-2);
+        }
+
+        [data-theme="dark"] .header h1 {
+            color: #EAEEEF;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .auth-section {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: var(--spacing-3);
+            margin-bottom: var(--spacing-3);
+        }
+
+        .auth-form {
+            display: flex;
+            gap: var(--spacing-2);
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: var(--spacing-2);
+        }
+
+        .auth-form input {
+            padding: var(--spacing-2) var(--spacing-2);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            flex: 1;
+            min-width: 200px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+
+        .auth-form input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.1);
+        }
+
+        /* User Info Styles */
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-2);
+        }
+
+        .user-details {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            padding: var(--spacing-2);
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            min-height: 64px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            min-height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #EAEEEF;
+            flex-shrink: 0;
+        }
+
+        .user-avatar i {
+            width: 20px;
+            height: 20px;
+        }
+
+        .user-text {
+            flex: 1;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .user-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 14px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .user-email {
+            color: var(--text-secondary);
+            font-size: 12px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .btn {
+            font-family: 'JetBrains Mono', monospace;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 44px;
+            min-width: 80px;
+            justify-content: center;
+        }
+
+        /* Lucide icon styles */
+        [data-lucide] {
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .btn [data-lucide] {
+            width: 16px;
+            height: 16px;
+        }
+
+        h4 [data-lucide] {
+            width: 16px;
+            height: 16px;
+            vertical-align: middle;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+            color: var(--bg-primary);
+        }
+
+        .btn-primary-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-primary-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: var(--card-bg);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--accent-hover);
+            color: var(--bg-primary);
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: #D8001B;
+            border: 2px solid #D8001B;
+        }
+
+        .btn-danger:hover {
+            background: #D8001B;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Dark mode button overrides */
+        [data-theme="dark"] .btn-primary {
+            color: black;
+        }
+
+        [data-theme="dark"] .btn-primary:hover {
+            color: black;
+        }
+
+        [data-theme="dark"] .btn-primary-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        [data-theme="dark"] .btn-primary-outline:hover {
+            background: var(--primary);
+            color: black;
+        }
+
+        [data-theme="dark"] .btn-secondary:hover {
+            color: black;
+        }
+
+        [data-theme="dark"] .btn-danger {
+            background: transparent;
+            color: #FF6166;
+            border: 2px solid #FF6166;
+        }
+
+        [data-theme="dark"] .btn-danger:hover {
+            background: #FF6166;
+            color: black;
+        }
+
+        .main-content {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 30px;
+        }
+
+        .content-sidebar {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 25px;
+            width: 350px;
+            min-width: 350px;
+            max-width: 350px;
+            height: fit-content;
+        }
+
+        .sidebar h3 {
+            font-family: 'JetBrains Mono', monospace;
+            margin-bottom: var(--spacing-3);
+            color: var(--text-primary);
+            font-size: 1.3rem;
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-3);
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-1);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: var(--spacing-2) var(--spacing-2);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: var(--spacing-2) var(--spacing-2);
+            padding-right: var(--spacing-6);
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            background: var(--input-bg);
+            color: var(--text-primary);
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right var(--spacing-2) center;
+            background-size: 16px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .sidebar-nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-2);
+            padding: var(--spacing-2) var(--spacing-2);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: var(--spacing-1);
+            color: var(--text-secondary);
+            text-decoration: none;
+        }
+
+
+
+        .sidebar-nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--primary);
+        }
+
+        .sidebar-nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .sidebar-nav-item i {
+            width: 18px;
+            height: 18px;
+        }
+
+        [data-theme="dark"] .sidebar-nav-item.active {
+            color: black;
+        }
+
+        .component-nav-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-1);
+            padding: var(--spacing-1) var(--spacing-2);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 4px;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            text-decoration: none;
+        }
+
+        .component-nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--primary);
+        }
+
+        .component-nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        [data-theme="dark"] .component-nav-item.active {
+            color: black;
+        }
+
+
+
+        .component-nav-item .component-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .component-nav-item .component-type {
+            font-size: 0.75rem;
+            opacity: 0.7;
+            margin-left: auto;
+        }
+
+        #component-subnav {
+            margin-left: 20px;
+            margin-top: 8px;
+            margin-bottom: 15px;
+        }
+
+        #token-subnav {
+            margin-left: 20px;
+            margin-top: 8px;
+            margin-bottom: 15px;
+        }
+
+        .token-category {
+            margin-bottom: 15px;
+        }
+
+        .token-category-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .token-category-header:hover {
+            background: var(--bg-secondary);
+            color: var(--primary);
+        }
+
+        .token-category-header i {
+            width: 14px;
+            height: 14px;
+        }
+
+        .token-category-header .token-count {
+            margin-left: auto;
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        .token-category-items {
+            margin-left: 20px;
+            margin-top: 8px;
+            display: none;
+        }
+
+        .token-category.expanded .token-category-items {
+            display: block;
+        }
+
+        .token-nav-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 2px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-decoration: none;
+        }
+
+        .token-nav-item:hover {
+            background: var(--bg-secondary);
+            color: var(--primary);
+        }
+
+        .token-nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .token-nav-item i {
+            width: 12px;
+            height: 12px;
+            flex-shrink: 0;
+        }
+
+        [data-theme="dark"] .token-nav-item.active {
+            color: black;
+        }
+
+        [data-theme="dark"] .token-category-header.active {
+            color: black;
+        }
+
+        .token-nav-item .token-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .token-nav-item .token-preview {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+            border: 1px solid var(--border-color);
+            flex-shrink: 0;
+        }
+
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .sidebar-section h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--spacing-2);
+            padding-left: var(--spacing-2);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .import-export-section {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            background: var(--bg-secondary);
+        }
+
+        .import-export-section h4 {
+            margin-bottom: 15px;
+            color: var(--text-primary);
+        }
+
+        .file-input {
+            margin-bottom: 15px;
+        }
+
+        .file-input input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+
+        .tokens-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .tokens-table th {
+            background: var(--code-bg);
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tokens-table td {
+            padding: 15px;
+            border-bottom: none;
+            vertical-align: middle;
+        }
+
+        .tokens-table tr:hover {
+            background: transparent;
+        }
+
+        .tokens-table tr.category-separator {
+            background: var(--bg-primary);
+            height: 8px;
+        }
+
+        .tokens-table tr.category-separator td {
+            padding: 4px 15px;
+            border-bottom: none;
+        }
+
+        .tokens-table tr.category-separator:hover {
+            background: var(--bg-primary);
+        }
+
+        #tokens-container {
+            margin-top: var(--spacing-3);
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: var(--spacing-3);
+            border: 1px solid var(--border-color);
+        }
+
+        .tokens-header {
+            margin-bottom: var(--spacing-4);
+            padding-bottom: var(--spacing-3);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tokens-header h2 {
+            margin: 0 0 var(--spacing-2) 0;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .tokens-header p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .token-example {
+            width: 40px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .token-name {
+            font-family: monospace;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .token-value {
+            font-family: monospace;
+            color: var(--text-secondary);
+            font-size: 13px;
+        }
+
+        .category-badge {
+            padding: 6px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s ease;
+        }
+
+        .category-badge.color {
+            background: #51F0DB;
+            color: #0A0A0A;
+            border-color: #51F0DB;
+        }
+
+        .category-badge.typography {
+            background: #FFC542;
+            color: #000000;
+            border-color: #FFC542;
+        }
+
+        .category-badge.spacing {
+            background: #94CDFF;
+            color: #0A0A0A;
+            border-color: #94CDFF;
+        }
+
+        .category-badge.corners {
+            background: #FEC7F0;
+            color: #0A0A0A;
+            border-color: #FEC7F0;
+        }
+
+        .category-badge.elevation {
+            background: #BDE56C;
+            color: #1F2917;
+            border-color: #BDE56C;
+        }
+
+        [data-theme="dark"] .category-badge.color {
+            background: #062822;
+            color: #0AC7B4;
+            border-color: #062822;
+        }
+
+        [data-theme="dark"] .category-badge.typography {
+            background: #331B00;
+            color: #FF990A;
+            border-color: #331B00;
+        }
+
+        [data-theme="dark"] .category-badge.spacing {
+            background: #10233D;
+            color: #52A8FF;
+            border-color: #10233D;
+        }
+
+        [data-theme="dark"] .category-badge.corners {
+            background: #3A1726;
+            color: #F75F8F;
+            border-color: #3A1726;
+        }
+
+        [data-theme="dark"] .category-badge.elevation {
+            background: #1F2917;
+            color: #BDEE63;
+            border-color: #1F2917;
+        }
+
+
+
+        .filter-chips {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            padding: 6px 12px;
+            border-radius: 9999px;
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Category-specific filter chip hover styles */
+        .filter-chip[data-category="color"]:hover {
+            background: #51F0DB;
+            color: #0A0A0A;
+        }
+
+        .filter-chip[data-category="spacing"]:hover {
+            background: #94CDFF;
+            color: #0A0A0A;
+        }
+
+        .filter-chip[data-category="typography"]:hover {
+            background: #FFC542;
+            color: #000000;
+        }
+
+        .filter-chip[data-category="corners"]:hover {
+            background: #FEC7F0;
+            color: #0A0A0A;
+        }
+
+        .filter-chip[data-category="elevation"]:hover {
+            background: #BDE56C;
+            color: #1F2917;
+        }
+
+        /* Dark mode category-specific hover styles */
+        [data-theme="dark"] .filter-chip[data-category="color"]:hover {
+            background: #062822;
+            color: #0AC7B4;
+        }
+
+        [data-theme="dark"] .filter-chip[data-category="spacing"]:hover {
+            background: #10233D;
+            color: #52A8FF;
+        }
+
+        [data-theme="dark"] .filter-chip[data-category="typography"]:hover {
+            background: #331B00;
+            color: #FF990A;
+        }
+
+        [data-theme="dark"] .filter-chip[data-category="corners"]:hover {
+            background: #3A1726;
+            color: #F75F8F;
+        }
+
+        [data-theme="dark"] .filter-chip[data-category="elevation"]:hover {
+            background: #1F2917;
+            color: #BDEE63;
+        }
+
+        /* Default hover for "All" and other chips */
+        .filter-chip:not([data-category]):hover,
+        .filter-chip[data-category="all"]:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        [data-theme="dark"] .filter-chip:not([data-category]):hover,
+        [data-theme="dark"] .filter-chip[data-category="all"]:hover {
+            background: var(--primary);
+            color: black;
+        }
+
+        /* Active states - use category colors */
+        .filter-chip[data-category="color"].active {
+            background: #51F0DB;
+            color: #0A0A0A;
+            border-color: #51F0DB;
+        }
+
+        .filter-chip[data-category="spacing"].active {
+            background: #94CDFF;
+            color: #0A0A0A;
+            border-color: #94CDFF;
+        }
+
+        .filter-chip[data-category="typography"].active {
+            background: #FFC542;
+            color: #000000;
+            border-color: #FFC542;
+        }
+
+        .filter-chip[data-category="corners"].active {
+            background: #FEC7F0;
+            color: #0A0A0A;
+            border-color: #FEC7F0;
+        }
+
+        .filter-chip[data-category="elevation"].active {
+            background: #BDE56C;
+            color: #1F2917;
+            border-color: #BDE56C;
+        }
+
+        /* Dark mode active states */
+        [data-theme="dark"] .filter-chip[data-category="color"].active {
+            background: #062822;
+            color: #0AC7B4;
+            border-color: #062822;
+        }
+
+        [data-theme="dark"] .filter-chip[data-category="spacing"].active {
+            background: #10233D;
+            color: #52A8FF;
+            border-color: #10233D;
+        }
+
+        [data-theme="dark"] .filter-chip[data-category="typography"].active {
+            background: #331B00;
+            color: #FF990A;
+            border-color: #331B00;
+        }
+
+        [data-theme="dark"] .filter-chip[data-category="corners"].active {
+            background: #3A1726;
+            color: #F75F8F;
+            border-color: #3A1726;
+        }
+
+        [data-theme="dark"] .filter-chip[data-category="elevation"].active {
+            background: #1F2917;
+            color: #BDEE63;
+            border-color: #1F2917;
+        }
+
+        /* Default active state for "All" */
+        .filter-chip:not([data-category]).active,
+        .filter-chip[data-category="all"].active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        [data-theme="dark"] .filter-chip:not([data-category]).active,
+        [data-theme="dark"] .filter-chip[data-category="all"].active {
+            background: var(--primary);
+            color: black;
+            border-color: var(--primary);
+        }
+
+        .filter-chip .chip-count {
+            background: transparent;
+            padding: 2px 6px;
+            border-radius: 9999px;
+            font-size: 10px;
+            min-width: 16px;
+            text-align: center;
+            color: inherit;
+        }
+
+        .filter-chip:not(.active) .chip-count {
+            background: transparent;
+            color: inherit;
+        }
+
+        [data-theme="dark"] .filter-chip .chip-count {
+            background: transparent;
+            color: inherit;
+        }
+
+        [data-theme="dark"] .filter-chip:not(.active) .chip-count {
+            background: transparent;
+            color: inherit;
+        }
+
+        /* Theme Filter Styles */
+        .theme-filter-section {
+            margin: var(--spacing-2) 0;
+            padding: var(--spacing-2) 0;
+        }
+
+        .theme-filter-buttons {
+            display: flex;
+            gap: var(--spacing-2);
+            flex-wrap: wrap;
+            align-items: center; /* Ensure vertical alignment */
+        }
+
+        .theme-filter-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 9999px;
+            background: var(--card-bg);
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .theme-filter-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .theme-filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .theme-filter-btn i {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            font-family: 'JetBrains Mono', monospace;
+            color: black;
+            margin: 0;
+        }
+
+        [data-theme="dark"] .modal-header h2 {
+            color: white;
+        }
+
+        [data-theme="dark"] .sidebar-brand {
+            color: white !important;
+        }
+
+        .close {
+            color: var(--text-secondary);
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .close:hover {
+            color: var(--primary);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 16px;
+            justify-content: flex-end;
+            margin-top: 24px;
+        }
+
+
+
+        .main-panel {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: var(--shadow);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .panel-header h3 {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+        }
+
+
+
+        .components-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            background: transparent;
+        }
+
+        #components-container {
+            background: transparent;
+            min-height: 400px;
+        }
+
+        .component-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            margin-bottom: 10px;
+        }
+
+        .component-card:hover {
+            box-shadow: none;
+            border-color: var(--border-color);
+        }
+
+        .component-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .component-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .component-type {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .component-type-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            font-weight: normal;
+        }
+
+        .component-status {
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        .token-status {
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Status badge CSS removed */
+
+        .filter-chip.active-filter {
+            background: #D2FAD2;
+            color: #003900;
+            border-color: #D2FAD2;
+        }
+
+        [data-theme="dark"] .filter-chip.active-filter {
+            background: #0F2E18;
+            color: #82EC8D;
+            border-color: #0F2E18;
+        }
+
+        .component-description {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .component-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            background: #F5E8FF;
+            color: #2F004E;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-size: 11px;
+        }
+
+        [data-theme="dark"] .tag {
+            background: #2F004E;
+            color: #DFA7FF;
+        }
+
+        .component-actions {
+            display: flex;
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .token-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .import-export-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 12px;
+            min-height: 36px;
+            min-width: 60px;
+        }
+
+
+
+        .simple-preview {
+            margin: 15px 0;
+        }
+
+        .simple-preview h4 {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .preview-box {
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--card-bg);
+            padding: 15px;
+            min-height: 100px;
+            position: relative;
+        }
+
+        .preview-content {
+            width: 100%;
+            min-height: 80px;
+        }
+
+        .preview-content * {
+            max-width: 100%;
+        }
+
+        /* Ensure all buttons in previews use global styles */
+        .preview-content button {
+            font-family: 'JetBrains Mono', monospace;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 44px;
+            min-width: 80px;
+            justify-content: center;
+            background: var(--primary);
+            color: white;
+        }
+
+        .preview-content button:hover {
+            background: var(--accent-hover);
+            color: var(--bg-primary);
+        }
+
+        [data-theme="dark"] .preview-content button {
+            color: black;
+        }
+
+        [data-theme="dark"] .preview-content button:hover {
+            color: black;
+        }
+
+        .code-preview {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            max-height: 150px;
+            overflow-y: auto;
+            color: var(--text-primary);
+        }
+
+        .code-block {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+
+        .code-block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .code-block-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+        }
+
+        .code-block-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .copy-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary);
+            color: var(--primary-foreground);
+            border-color: var(--primary);
+        }
+
+        .code-block pre {
+            margin: 0;
+            padding: 15px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 12px;
+            line-height: 1.4;
+            max-height: 200px;
+            overflow-y: auto;
+            color: var(--text-primary);
+        }
+
+        .token-value-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .token-value-copy-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 6px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .token-value-copy-btn:hover {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        [data-theme="dark"] .error {
+            background: #7c2d12;
+            color: #fca5a5;
+        }
+
+        [data-theme="dark"] .success {
+            background: #166534;
+            color: #86efac;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .close {
+            color: var(--text-secondary);
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: var(--text-primary);
+        }
+
+        /* Stats CSS removed */
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 400px;
+        }
+
+        .toast {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            border-left: 4px solid;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+            max-width: 400px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast.error {
+            border-left-color: var(--danger-color);
+        }
+
+        .toast.success {
+            border-left-color: #10b981;
+        }
+
+        .toast.info {
+            border-left-color: var(--accent-color);
+        }
+
+        .toast-icon {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            font-size: 0.9rem;
+        }
+
+        .toast-message {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .toast-close:hover {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .auth-form {
+                flex-direction: column;
+            }
+            
+
+            
+            .components-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Prevent layout shifts */
+        .tokens-container {
+            min-height: 400px; /* Ensure minimum height to prevent jumping */
+        }
+
+        .tokens-table {
+            margin-top: 0; /* Remove any top margin that could cause shifting */
+        }
+
+        .tokens-header {
+            margin-bottom: var(--spacing-4); /* Consistent spacing */
+        }
+
+        .filter-chips {
+            margin-bottom: var(--spacing-3); /* Consistent spacing */
+        }
+
+        /* Prevent table shifting when filtering */
+        .tokens-table-container {
+            position: relative;
+            min-height: 400px; /* Minimum height instead of fixed */
+            max-height: 80vh; /* Maximum height to prevent overflow */
+            overflow: auto; /* Allow scrolling */
+        }
+
+        .tokens-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tokens-table thead {
+            position: sticky;
+            top: 0;
+            background: var(--card-bg);
+            z-index: 5;
+        }
+
+        .tokens-table tbody {
+            /* Remove max-height constraint to show all tokens */
+        }
+
+        .tokens-table tbody tr {
+            transition: opacity 0.3s ease;
+        }
+
+        .tokens-table tbody tr[style*="display: none"] {
+            opacity: 0;
+            height: 0;
+            overflow: hidden;
+        }
+
+        /* Tokens stats CSS removed */
+
+        /* Prevent any layout shifts */
+        .tokens-section {
+            min-height: 600px; /* Reduced minimum height */
+        }
+
+        /* Theme Filter Styles */
+    </style>
+</head>
+<body>
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar-nav">
+            <!-- Logo/Brand -->
+            <div style="margin-bottom: 30px; padding: 0 16px;">
+                <h2 style="color: black; font-size: 1.5rem; font-weight: 700;" class="sidebar-brand">Design System</h2>
+                <p style="color: var(--text-secondary); font-size: 0.875rem;">Component Library</p>
+            </div>
+
+            <!-- Authentication Section -->
+            <div class="sidebar-section">
+                <h3>Account</h3>
+                <div class="auth-section" id="auth-section">
+                    <!-- Login Form (shown when not logged in) -->
+                    <div id="login-form" class="auth-form">
+                        <input type="email" id="login-email" placeholder="Email" value="tokenadmin@example.com">
+                        <input type="password" id="login-password" placeholder="Password" value="admin123">
+                        <button class="btn btn-primary" onclick="login()">Login</button>
+                    </div>
+                    
+                    <!-- User Info (shown when logged in) -->
+                    <div id="user-info" class="user-info" style="display: none;">
+                        <div class="user-details">
+                            <div class="user-avatar">
+                                <i data-lucide="user"></i>
+                            </div>
+                            <div class="user-text">
+                                <div class="user-name" id="user-name">Admin User</div>
+                                <div class="user-email" id="user-email">admin@example.com</div>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary btn-sm" onclick="logout()">
+                            <i data-lucide="log-out"></i>
+                            <span>Logout</span>
+                        </button>
+                    </div>
+                    
+                    <div id="auth-message"></div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <div class="sidebar-section">
+                <h3>Navigation</h3>
+                <div class="sidebar-nav-item active" onclick="switchDashboardTab('components')">
+                    <i data-lucide="layers"></i>
+                    <span>Components</span>
+                </div>
+                
+                <!-- Component Subnavigation -->
+                <div id="component-subnav" style="display: none;">
+                    <div id="component-list">
+                        <!-- Component items will be dynamically added here -->
+                    </div>
+                </div>
+                
+                <div class="sidebar-nav-item" onclick="console.log('Design Tokens clicked'); switchDashboardTab('tokens')">
+                    <i data-lucide="palette"></i>
+                    <span>Design Tokens</span>
+                </div>
+                
+                <!-- Token Subnavigation -->
+                <div id="token-subnav" style="display: none;">
+                    <div id="token-categories">
+                        <!-- Token categories will be dynamically added here -->
+                    </div>
+                </div>
+            </div>
+
+
+
+            <!-- Documentation -->
+            <div class="sidebar-section">
+                <h3>Resources</h3>
+                <div class="sidebar-nav-item" onclick="window.open('/docs', '_blank')">
+                    <i data-lucide="book-open"></i>
+                    <span>Documentation</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Dashboard -->
+        <div class="main-dashboard">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h1 id="dashboard-title">Component Library</h1>
+                        <p id="dashboard-subtitle">Create, manage, and organize your design system components</p>
+                    </div>
+                    <div class="theme-toggle-container">
+                        <div class="theme-toggle-switch" onclick="toggleTheme()">
+                            <i data-lucide="sun" class="sun-icon"></i>
+                            <div class="toggle-track">
+                                <div class="toggle-thumb"></div>
+                            </div>
+                            <i data-lucide="moon" class="moon-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+                        <!-- Dashboard Content -->
+            <div style="display: grid; grid-template-columns: 350px 1fr; gap: var(--spacing-4);">
+                <!-- Content Sidebar -->
+                <div class="content-sidebar">
+                
+                <div id="components-tab" class="tab-content active">
+                    <h3>Add New Component</h3>
+                <form id="component-form">
+                    <div class="form-group">
+                        <label for="component-name">Name *</label>
+                        <input type="text" id="component-name" required placeholder="e.g., PrimaryButton">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="component-type">Type *</label>
+                        <select id="component-type" required>
+                            <option value="">Select Type</option>
+                            <option value="button">Button</option>
+                            <option value="input">Input</option>
+                            <option value="card">Card</option>
+                            <option value="modal">Modal</option>
+                            <option value="navigation">Navigation</option>
+                            <option value="form">Form</option>
+                            <option value="layout">Layout</option>
+                            <option value="typography">Typography</option>
+                            <option value="icon">Icon</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="component-description">Description</label>
+                        <textarea id="component-description" placeholder="Describe what this component does..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="component-status">Status</label>
+                        <select id="component-status">
+                            <option value="draft">Draft</option>
+                            <option value="active">Active</option>
+                            <option value="deprecated">Deprecated</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="component-tags">Tags (comma-separated)</label>
+                        <input type="text" id="component-tags" placeholder="button, primary, ui">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="component-react">React Code</label>
+                        <textarea id="component-react" placeholder="Paste your React component code here..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="component-theme">Component Theme</label>
+                        <select id="component-theme" onchange="updateComponentThemeFields()">
+                            <option value="all">All Themes</option>
+                            <option value="light">Light Only</option>
+                            <option value="dark">Dark Only</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="component-css">CSS Styles</label>
+                        <textarea id="component-css" placeholder="Paste your CSS styles here..."></textarea>
+                        <div style="margin-top: 16px;">
+                            <div style="display: flex; gap: 16px; margin-bottom: 8px;">
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="generateThemeCSS()">Generate Theme-Aware CSS</button>
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="generateCustomThemeCSS()">Generate Custom Theme CSS</button>
+                            </div>
+                            <small style="color: var(--text-secondary);">Creates light/dark mode variants</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group" id="component-theme-vars" style="display: none;">
+                        <label>Custom Theme Variables</label>
+                        <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; background: var(--code-bg);">
+                            <div style="margin-bottom: 10px;">
+                                <label style="font-size: 12px; color: var(--text-secondary);">Light Theme:</label>
+                                <input type="text" id="component-light-bg" placeholder="Background color" style="width: 100%; margin-bottom: 5px; padding: 5px; font-size: 12px;">
+                                <input type="text" id="component-light-text" placeholder="Text color" style="width: 100%; margin-bottom: 5px; padding: 5px; font-size: 12px;">
+                                <input type="text" id="component-light-accent" placeholder="Accent color" style="width: 100%; padding: 5px; font-size: 12px;">
+                            </div>
+                            <div>
+                                <label style="font-size: 12px; color: var(--text-secondary);">Dark Theme:</label>
+                                <input type="text" id="component-dark-bg" placeholder="Background color" style="width: 100%; margin-bottom: 5px; padding: 5px; font-size: 12px;">
+                                <input type="text" id="component-dark-text" placeholder="Text color" style="width: 100%; margin-bottom: 5px; padding: 5px; font-size: 12px;">
+                                <input type="text" id="component-dark-accent" placeholder="Accent color" style="width: 100%; padding: 5px; font-size: 12px;">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="component-html">HTML Code</label>
+                        <textarea id="component-html" placeholder="Paste your HTML code here..."></textarea>
+                    </div>
+
+
+
+                    <div style="margin-top: 24px;">
+                        <button type="submit" class="btn btn-primary">Create Component</button>
+                    </div>
+                </form>
+                </div>
+                
+                <div id="tokens-tab" class="tab-content">
+                    <h3>Add New Token</h3>
+                    <form id="token-form">
+                        <div class="form-group">
+                            <label for="token-name">Name *</label>
+                            <input type="text" id="token-name" required placeholder="e.g., primary-blue">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="token-category">Category *</label>
+                            <select id="token-category" required>
+                                <option value="">Select Category</option>
+                                <option value="color">Color</option>
+                                <option value="typography">Typography</option>
+                                <option value="spacing">Spacing</option>
+                                <option value="elevation">Elevation</option>
+                                <option value="corners">Corners</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="token-theme">Theme</label>
+                            <select id="token-theme" onchange="updateTokenValueField()">
+                                <option value="all">All Themes</option>
+                                <option value="light">Light Only</option>
+                                <option value="dark">Dark Only</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="token-value-light-group">
+                            <label for="token-value-light">Light Theme Value *</label>
+                            <input type="text" id="token-value-light" placeholder="e.g., #7e22ce, 16px, 1.5rem">
+                        </div>
+
+                        <div class="form-group" id="token-value-dark-group" style="display: none;">
+                            <label for="token-value-dark">Dark Theme Value</label>
+                            <input type="text" id="token-value-dark" placeholder="e.g., #c084fc, 18px, 1.6rem">
+                        </div>
+
+                        <div class="form-group" id="token-value-both-group" style="display: none;">
+                            <label for="token-value-both">Value (Both Themes) *</label>
+                            <input type="text" id="token-value-both" placeholder="e.g., #7e22ce, 16px, 1.5rem">
+                        </div>
+
+                        <div class="form-group">
+                            <div style="margin-bottom: 16px;">
+                                <button type="button" class="btn btn-secondary btn-sm" onclick="previewTokenTheme()">Preview Theme</button>
+                            </div>
+                            <div id="token-theme-preview" style="margin-top: 10px; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--code-bg); display: none;">
+                                <h5 style="margin: 0 0 10px 0; color: var(--text-primary);">Theme Preview:</h5>
+                                <div id="token-preview-content"></div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="token-value">Value *</label>
+                            <input type="text" id="token-value" required placeholder="e.g., #7e22ce">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="token-description">Description</label>
+                            <textarea id="token-description" placeholder="Describe what this token is used for..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="token-tags">Tags (comma-separated)</label>
+                            <input type="text" id="token-tags" placeholder="primary, brand, ui">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="token-status">Status</label>
+                            <select id="token-status">
+                                <option value="active">Active</option>
+                                <option value="draft">Draft</option>
+                                <option value="deprecated">Deprecated</option>
+                            </select>
+                        </div>
+
+                        <div style="margin-top: 24px;">
+                            <button type="submit" class="btn btn-primary">Create Token</button>
+                        </div>
+                    </form>
+
+                    <!-- Import/Export Section -->
+                    <div class="import-export-section">
+                        <h4><i data-lucide="folder-open" style="width: 16px; height: 16px; display: inline-block; margin-right: 8px;"></i>Import/Export JSON</h4>
+                        
+                        <div class="file-input">
+                            <label for="json-file">Upload JSON File:</label>
+                            <input type="file" id="json-file" accept=".json">
+                        </div>
+                        
+                        <div class="import-export-buttons">
+                            <button class="btn btn-secondary" onclick="uploadTokens()"><i data-lucide="upload"></i>Upload Tokens</button>
+                            <button class="btn btn-primary" onclick="exportTokens()"><i data-lucide="download"></i>Export as JSON</button>
+                        </div>
+                        
+                        <div id="upload-message"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Main Panel - Display Components -->
+            <div class="main-panel">
+                <div class="panel-header">
+                    <h3 id="panel-title">Component Library</h3>
+                    <button class="btn btn-secondary" onclick="refreshContent()">Refresh</button>
+                </div>
+
+                <!-- Stats section removed -->
+
+
+
+                <!-- Components Grid -->
+                <div id="components-container" style="display: block;">
+                    <div class="loading">Loading components...</div>
+                </div>
+
+                <!-- Tokens Display Container -->
+                <div id="tokens-container" style="display: none;">
+                    <div class="loading">Loading tokens...</div>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Component Detail Modal -->
+    <div id="component-modal" class="modal">
+        <div class="modal-content">
+                            <span class="close" onclick="closeComponentModal()">&times;</span>
+            <div id="modal-content">
+                <!-- Modal content will be populated here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Component Modal -->
+    <div id="editComponentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Component</h2>
+                <span class="close" onclick="closeModal('editComponentModal')">&times;</span>
+            </div>
+            <form id="edit-component-form">
+                <input type="hidden" id="edit-component-id">
+                <div class="form-group">
+                    <label for="edit-component-name">Name *</label>
+                    <input type="text" id="edit-component-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-component-type">Type *</label>
+                    <select id="edit-component-type" required>
+                        <option value="">Select Type</option>
+                        <option value="button">Button</option>
+                        <option value="input">Input</option>
+                        <option value="card">Card</option>
+                        <option value="modal">Modal</option>
+                        <option value="navigation">Navigation</option>
+                        <option value="form">Form</option>
+                        <option value="layout">Layout</option>
+                        <option value="typography">Typography</option>
+                        <option value="icon">Icon</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-component-description">Description</label>
+                    <textarea id="edit-component-description"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-component-status">Status</label>
+                    <select id="edit-component-status">
+                        <option value="draft">Draft</option>
+                        <option value="active">Active</option>
+                        <option value="deprecated">Deprecated</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-component-tags">Tags (comma-separated)</label>
+                    <input type="text" id="edit-component-tags">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-component-theme">Component Theme</label>
+                    <select id="edit-component-theme" onchange="updateEditComponentThemeFields()">
+                        <option value="all">All Themes</option>
+                        <option value="light">Light Only</option>
+                        <option value="dark">Dark Only</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="edit-component-theme-vars" style="display: none;">
+                    <label>Custom Theme Variables</label>
+                    <div style="border: 1px solid var(--border-color); border-radius: 8px; padding: 15px; background: var(--code-bg);">
+                        <div style="margin-bottom: 10px;">
+                            <label style="font-size: 12px; color: var(--text-secondary);">Light Theme:</label>
+                            <input type="text" id="edit-component-light-bg" placeholder="Background color" style="width: 100%; margin-bottom: 5px; padding: 5px; font-size: 12px;">
+                            <input type="text" id="edit-component-light-text" placeholder="Text color" style="width: 100%; margin-bottom: 5px; padding: 5px; font-size: 12px;">
+                            <input type="text" id="edit-component-light-accent" placeholder="Accent color" style="width: 100%; padding: 5px; font-size: 12px;">
+                        </div>
+                        <div>
+                            <label style="font-size: 12px; color: var(--text-secondary);">Dark Theme:</label>
+                            <input type="text" id="edit-component-dark-bg" placeholder="Background color" style="width: 100%; margin-bottom: 5px; padding: 5px; font-size: 12px;">
+                            <input type="text" id="edit-component-dark-text" placeholder="Text color" style="width: 100%; margin-bottom: 5px; padding: 5px; font-size: 12px;">
+                            <input type="text" id="edit-component-dark-accent" placeholder="Accent color" style="width: 100%; padding: 5px; font-size: 12px;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-component-react">React Code</label>
+                    <textarea id="edit-component-react"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-component-css">CSS Styles</label>
+                    <textarea id="edit-component-css"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-component-html">HTML Code</label>
+                    <textarea id="edit-component-html"></textarea>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editComponentModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Component</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Token Modal -->
+    <div id="editTokenModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Token</h2>
+                <span class="close" onclick="closeModal('editTokenModal')">&times;</span>
+            </div>
+            <form id="edit-token-form">
+                <input type="hidden" id="edit-token-id">
+                <div class="form-group">
+                    <label for="edit-token-name">Name *</label>
+                    <input type="text" id="edit-token-name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-token-category">Category *</label>
+                    <select id="edit-token-category" required>
+                        <option value="">Select Category</option>
+                        <option value="color">Color</option>
+                        <option value="typography">Typography</option>
+                        <option value="spacing">Spacing</option>
+                        <option value="elevation">Elevation</option>
+                        <option value="corners">Corners</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-token-theme">Theme</label>
+                    <select id="edit-token-theme" onchange="updateEditTokenValueField()">
+                        <option value="all">All Themes</option>
+                        <option value="light">Light Only</option>
+                        <option value="dark">Dark Only</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="edit-token-value-light-group">
+                    <label for="edit-token-value-light">Light Theme Value *</label>
+                    <input type="text" id="edit-token-value-light" placeholder="e.g., #7e22ce, 16px, 1.5rem">
+                </div>
+
+                <div class="form-group" id="edit-token-value-dark-group" style="display: none;">
+                    <label for="edit-token-value-dark">Dark Theme Value</label>
+                    <input type="text" id="edit-token-value-dark" placeholder="e.g., #c084fc, 18px, 1.6rem">
+                </div>
+
+                <div class="form-group" id="edit-token-value-both-group" style="display: none;">
+                    <label for="edit-token-value-both">Value (Both Themes) *</label>
+                    <input type="text" id="edit-token-value-both" placeholder="e.g., #7e22ce, 16px, 1.5rem">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-token-description">Description</label>
+                    <textarea id="edit-token-description"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-token-tags">Tags (comma-separated)</label>
+                    <input type="text" id="edit-token-tags">
+                </div>
+
+                <div class="form-group">
+                    <label for="edit-token-status">Status</label>
+                    <select id="edit-token-status">
+                        <option value="active">Active</option>
+                        <option value="draft">Draft</option>
+                        <option value="deprecated">Deprecated</option>
+                    </select>
+                </div>
+
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editTokenModal')">Cancel</button>
+                    <button type="button" class="btn btn-danger" onclick="deleteTokenFromModal()">Delete Token</button>
+                    <button type="submit" class="btn btn-primary">Update Token</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let authToken = localStorage.getItem('authToken');
+        let currentUser = null;
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing app...');
+            console.log('switchDashboardTab function available:', typeof switchDashboardTab);
+            console.log('Initial dashboard title:', document.getElementById('dashboard-title').textContent);
+            // Initialize Lucide icons
+            lucide.createIcons();
+            
+            // Add global click handler for debugging
+            document.addEventListener('click', function(e) {
+                if (e.target.textContent === 'Update Token') {
+                    console.log('Update Token button clicked!');
+                }
+            });
+            
+            checkAuth();
+            updateAuthDisplay(); // Set initial auth display
+            loadComponents();
+            loadTokens(); // Load tokens on initialization
+            updateTokenSubnav(); // Update token subnavigation on initialization
+            addProp(); // Add initial prop row
+            setupTokenForm();
+            setupEditForms();
+            initializeTheme();
+            
+            // Initialize theme fields
+            updateTokenValueField();
+            updateComponentThemeFields();
+        });
+
+        // Theme management
+        function initializeTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeButton(savedTheme);
+        }
+
+        function toggleTheme() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeButton(newTheme);
+        }
+
+        function updateThemeButton(theme) {
+            const text = document.getElementById('theme-text');
+            
+            if (theme === 'dark') {
+                text.textContent = 'Light Mode';
+            } else {
+                text.textContent = 'Dark Mode';
+            }
+        }
+
+        // Setup edit forms
+        function setupEditForms() {
+            console.log('Setting up edit forms...');
+            // Edit component form
+            document.getElementById('edit-component-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (!authToken) {
+                    showMessage('Please log in to edit components', 'error');
+                    return;
+                }
+
+                const componentId = document.getElementById('edit-component-id').value;
+                            const formData = {
+                name: document.getElementById('edit-component-name').value,
+                type: document.getElementById('edit-component-type').value,
+                description: document.getElementById('edit-component-description').value,
+                status: document.getElementById('edit-component-status').value,
+                tags: document.getElementById('edit-component-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag),
+                theme: document.getElementById('edit-component-theme').value,
+                code: {
+                    react: document.getElementById('edit-component-react').value,
+                    html: document.getElementById('edit-component-html').value
+                },
+                styles: {
+                    css: document.getElementById('edit-component-css').value
+                },
+                customTheme: {
+                    light: {
+                        bg: document.getElementById('edit-component-light-bg').value,
+                        text: document.getElementById('edit-component-light-text').value,
+                        accent: document.getElementById('edit-component-light-accent').value
+                    },
+                    dark: {
+                        bg: document.getElementById('edit-component-dark-bg').value,
+                        text: document.getElementById('edit-component-dark-text').value,
+                        accent: document.getElementById('edit-component-dark-accent').value
+                    }
+                }
+            };
+
+                try {
+                    const response = await fetch(`/api/components/${componentId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showMessage('Component updated successfully!', 'success');
+                        closeModal('editComponentModal');
+                        loadComponents();
+                        updateComponentSubnav();
+                    } else {
+                        showMessage(data.error || 'Failed to update component', 'error');
+                    }
+                } catch (error) {
+                    showMessage('Error updating component', 'error');
+                }
+            });
+
+            // Edit token form event listener is now set up in showEditTokenModal function
+        }
+
+        // Modal utility functions
+        function closeModal(modalId) {
+            console.log('Closing modal:', modalId);
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'none';
+            } else {
+                console.error('Modal not found:', modalId);
+            }
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+
+
+        // Authentication functions
+        async function login() {
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const messageDiv = document.getElementById('auth-message');
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    authToken = data.token;
+                    currentUser = data.user;
+                    localStorage.setItem('authToken', authToken);
+                    showMessage('Login successful!', 'success');
+                    updateAuthDisplay();
+                    loadComponents();
+                } else {
+                    showMessage(data.error, 'error');
+                }
+            } catch (error) {
+                showMessage('Login failed. Please try again.', 'error');
+            }
+        }
+
+        function logout() {
+            authToken = null;
+            currentUser = null;
+            localStorage.removeItem('authToken');
+            showMessage('Logged out successfully.', 'success');
+            updateAuthDisplay();
+            loadComponents();
+        }
+
+        function checkAuth() {
+            if (authToken) {
+                // Verify token is still valid
+                fetch('/api/auth/me', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        logout();
+                    } else {
+                        response.json().then(data => {
+                            currentUser = data.user;
+                            updateAuthDisplay();
+                        });
+                    }
+                })
+                .catch(() => {
+                    logout();
+                });
+            } else {
+                updateAuthDisplay();
+            }
+        }
+
+        function updateAuthDisplay() {
+            const loginForm = document.getElementById('login-form');
+            const userInfo = document.getElementById('user-info');
+            const userName = document.getElementById('user-name');
+            const userEmail = document.getElementById('user-email');
+
+            if (authToken && currentUser) {
+                // User is logged in - show user info
+                loginForm.style.display = 'none';
+                userInfo.style.display = 'flex';
+                
+                // Update user details
+                userName.textContent = currentUser.username || currentUser.email || 'Admin User';
+                userEmail.textContent = currentUser.email || 'admin@example.com';
+            } else {
+                // User is not logged in - show login form
+                loginForm.style.display = 'flex';
+                userInfo.style.display = 'none';
+            }
+        }
+
+        // Component management functions
+        async function loadComponents() {
+            const container = document.getElementById('components-container');
+            
+            if (!authToken) {
+                container.innerHTML = '<div class="loading">Please log in to view components</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/components', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    displayComponents(data.components);
+                    updateComponentSubnav();
+                } else {
+                    container.innerHTML = '<div class="error">Failed to load components</div>';
+                }
+            } catch (error) {
+                container.innerHTML = '<div class="error">Error loading components</div>';
+            }
+        }
+
+        function displayComponents(components) {
+            const container = document.getElementById('components-container');
+            
+            // Store components globally for subnavigation
+            window.components = components;
+            
+            if (components.length === 0) {
+                container.innerHTML = '<div class="loading">No components found</div>';
+                return;
+            }
+
+            // Generate filter chips for components
+            const filterChips = generateComponentFilterChips(components);
+
+            const componentsHTML = `
+                ${filterChips}
+                <div class="components-grid">
+                    ${components.map(component => `
+                        <div class="component-card" data-component-id="${component._id}" data-type="${component.type}">
+                            <div class="component-header">
+                                <div>
+                                    <div class="component-title">${component.name}</div>
+                                    <div class="component-type-text">${component.type}</div>
+                                </div>
+                                <!-- Status badge removed -->
+                            </div>
+                            
+                            <div class="component-description">${component.description || 'No description provided'}</div>
+                            
+                            ${component.tags && component.tags.length > 0 ? `
+                                <div class="component-tags">
+                                    ${component.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                                </div>
+                            ` : ''}
+                            
+                            <div class="simple-preview">
+                                <h4>Preview:</h4>
+                                <div class="preview-box">
+                                    <div class="preview-content" id="preview-${component._id}"></div>
+                                </div>
+                                <button class="btn btn-secondary btn-sm" onclick="refreshPreview('${component._id}')" style="margin-top: 10px;">Refresh Preview</button>
+                            </div>
+                            
+                            ${component.code && component.code.react ? `
+                                ${createCodeBlock(component.code.react.substring(0, 200) + (component.code.react.length > 200 ? '...' : ''), 'React')}
+                            ` : ''}
+                            
+                            <div class="component-actions">
+                                <button class="btn btn-secondary btn-sm" onclick="viewComponent('${component._id}')">View</button>
+                                <button class="btn btn-primary-outline btn-sm" onclick="editComponent('${component._id}')">Edit</button>
+                                <button class="btn btn-danger btn-sm" onclick="deleteComponent('${component._id}')">Delete</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+
+            container.innerHTML = componentsHTML;
+            
+            // Initialize Lucide icons for filter chips
+            lucide.createIcons();
+            
+            // Render previews after DOM is updated
+            components.forEach(component => {
+                renderComponentPreview(component);
+            });
+        }
+
+        function renderComponentPreview(component) {
+            console.log('Rendering preview for component:', component.name);
+            const previewElement = document.getElementById(`preview-${component._id}`);
+            if (!previewElement) {
+                console.error('Preview element not found for:', component._id);
+                return;
+            }
+            
+            let html = component.code?.html || '';
+            const css = component.styles?.css || '';
+            
+            // If no HTML but has React code, create a simple HTML representation
+            if (!html && component.code?.react) {
+                html = generateHTMLFromReact(component.code.react, component.name);
+            }
+            
+            // If still no HTML, create a placeholder based on component type
+            if (!html) {
+                html = generatePlaceholderHTML(component);
+            }
+            
+            console.log('HTML:', html);
+            console.log('CSS:', css);
+            
+            // Create a style element for the component's CSS
+            const styleId = `style-${component._id}`;
+            let styleElement = document.getElementById(styleId);
+            if (!styleElement) {
+                styleElement = document.createElement('style');
+                styleElement.id = styleId;
+                document.head.appendChild(styleElement);
+            }
+            
+            // Add scoped CSS with theme support
+            const scopedCSS = css.replace(/([^{}]+){/g, `.preview-${component._id} $1{`);
+            const themeCSS = generatePreviewCSS(component);
+            styleElement.textContent = themeCSS + `\n.preview-${component._id} { ${scopedCSS} }`;
+            
+            // Add preview class and render HTML
+            previewElement.className = `preview-content preview-${component._id}`;
+            previewElement.innerHTML = html;
+            
+            // Reinitialize Lucide icons in the preview
+            lucide.createIcons();
+            
+            console.log('Preview rendered successfully');
+            
+            // Add basic interactivity
+            addPreviewInteractivity(previewElement);
+        }
+
+        function generateHTMLFromReact(reactCode, componentName) {
+            // Simple React to HTML conversion for common patterns
+            const reactStr = reactCode.toString();
+            
+            // Extract className from React code
+            const classNameMatch = reactStr.match(/className\s*=\s*["']([^"']+)["']/);
+            const className = classNameMatch ? classNameMatch[1] : '';
+            
+            // Extract text content
+            const textMatch = reactStr.match(/>\s*([^<]+)\s*</);
+            const text = textMatch ? textMatch[1].trim() : componentName;
+            
+            // Generate appropriate HTML based on component type
+            if (reactStr.includes('button')) {
+                return `<button class="${className}">${text}</button>`;
+            } else if (reactStr.includes('input')) {
+                return `<input class="${className}" placeholder="${text}" />`;
+            } else if (reactStr.includes('div')) {
+                return `<div class="${className}">${text}</div>`;
+            } else {
+                return `<div class="${className}">${text}</div>`;
+            }
+        }
+
+        function generatePlaceholderHTML(component) {
+            // Generate placeholder HTML based on component type
+            const className = component.name.toLowerCase().replace(/([A-Z])/g, '-$1').toLowerCase();
+            
+            switch (component.type) {
+                case 'button':
+                    return `<button class="${className}">${component.name}</button>`;
+                case 'input':
+                    return `<input class="${className}" placeholder="${component.name}" />`;
+                case 'card':
+                    return `<div class="${className}"><h3>${component.name}</h3><p>Card content</p></div>`;
+                case 'modal':
+                    return `<div class="${className}"><div class="modal-content"><h3>${component.name}</h3><p>Modal content</p></div></div>`;
+                case 'form':
+                    return `<form class="${className}"><input placeholder="Input field" /><button type="submit">Submit</button></form>`;
+                case 'navigation':
+                    return `<nav class="${className}"><a href="#">Home</a><a href="#">About</a><a href="#">Contact</a></nav>`;
+                case 'typography':
+                    return `<h1 class="${className}">${component.name}</h1>`;
+                case 'icon':
+                    return `<div class="${className}"><i data-lucide="star" style="width: 20px; height: 20px;"></i></div>`;
+                case 'layout':
+                    return `<div class="${className}"><div class="header">Header</div><div class="content">Content</div><div class="footer">Footer</div></div>`;
+                default:
+                    return `<div class="${className}">${component.name}</div>`;
+            }
+        }
+
+        function generatePreviewCSS(component) {
+            const css = component.styles?.css || '';
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            
+            // Add theme variables to preview
+            return `
+                :root {
+                    --bg-primary: #FBFAF4;
+                    --bg-secondary: #FBFAF8;
+                    --text-primary: #333;
+                    --text-secondary: #666;
+                    --border-color: #e1e5e9;
+                                --accent-color: #7e22ce;
+            --accent-hover: #581c87;
+                    --card-bg: white;
+                    --input-bg: white;
+                }
+
+                [data-theme="dark"] {
+                    --bg-primary: #1a1a1a;
+                    --bg-secondary: #031B20;
+                    --text-primary: #EAEEEF;
+                    --text-secondary: #b0b0b0;
+                    --border-color: #404040;
+                                --accent-color: #c084fc;
+            --accent-hover: #d8b4fe;
+                    --card-bg: #031B20;
+                    --input-bg: #1f2121;
+                }
+
+                body {
+                    background: var(--bg-primary);
+                    color: var(--text-primary);
+                    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    padding: 20px;
+                    margin: 0;
+                }
+
+                ${css}
+            `;
+        }
+
+        function refreshPreview(componentId) {
+            console.log('Refreshing preview for component:', componentId);
+            // Find the component data and re-render
+            if (authToken) {
+                fetch(`/api/components/${componentId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                })
+                .then(response => response.json())
+                .then(component => {
+                    renderComponentPreview(component);
+                })
+                .catch(error => {
+                    console.error('Failed to refresh preview:', error);
+                });
+            }
+        }
+
+        function addPreviewInteractivity(container) {
+            // Handle button clicks
+            container.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = 'scale(1)';
+                    }, 150);
+                });
+            });
+            
+            // Handle form submissions
+            container.querySelectorAll('form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    alert('Form submitted (preview mode)');
+                });
+            });
+            
+            // Handle input focus
+            container.querySelectorAll('input, textarea, select').forEach(input => {
+                input.addEventListener('focus', function() {
+                    this.style.outline = `2px solid var(--accent-color)`;
+                });
+                input.addEventListener('blur', function() {
+                    this.style.outline = 'none';
+                });
+            });
+        }
+
+        function generateThemeCSS() {
+            const cssTextarea = document.getElementById('component-css');
+            const currentCSS = cssTextarea.value;
+            
+            if (!currentCSS.trim()) {
+                showMessage('Please add some CSS first', 'error');
+                return;
+            }
+            
+            // Generate theme-aware CSS
+            const themeCSS = `
+/* Light theme styles */
+${currentCSS}
+
+/* Dark theme styles */
+[data-theme="dark"] ${currentCSS.replace(/([^{}]+){/g, '$1{')}
+            `.trim();
+            
+            cssTextarea.value = themeCSS;
+            showMessage('Theme-aware CSS generated!', 'success');
+        }
+
+        function generateCustomThemeCSS() {
+            const cssTextarea = document.getElementById('component-css');
+            const currentCSS = cssTextarea.value;
+            
+            if (!currentCSS.trim()) {
+                showMessage('Please add some CSS first', 'error');
+                return;
+            }
+            
+            // Get custom theme values
+            const lightBg = document.getElementById('component-light-bg').value || '#ffffff';
+            const lightText = document.getElementById('component-light-text').value || '#333';
+            const lightAccent = document.getElementById('component-light-accent').value || '#7e22ce';
+            const darkBg = document.getElementById('component-dark-bg').value || '#1a1a1a';
+            const darkText = document.getElementById('component-dark-text').value || '#ffffff';
+            const darkAccent = document.getElementById('component-dark-accent').value || '#c084fc';
+            
+            // Generate custom theme CSS
+            const customThemeCSS = `
+/* Custom theme variables */
+:root {
+    --component-bg: ${lightBg};
+    --component-text: ${lightText};
+    --component-accent: ${lightAccent};
+}
+
+[data-theme="dark"] {
+    --component-bg: ${darkBg};
+    --component-text: ${darkText};
+    --component-accent: ${darkAccent};
+}
+
+/* Component styles with custom theme variables */
+${currentCSS.replace(/#[0-9a-fA-F]{3,6}|#[0-9a-fA-F]{3}/g, 'var(--component-accent)')}
+            `.trim();
+            
+            cssTextarea.value = customThemeCSS;
+            showMessage('Custom theme CSS generated!', 'success');
+        }
+
+        function updateTokenValueField() {
+            const themeSelect = document.getElementById('token-theme');
+            const lightGroup = document.getElementById('token-value-light-group');
+            const darkGroup = document.getElementById('token-value-dark-group');
+            const bothGroup = document.getElementById('token-value-both-group');
+            
+            // Hide all groups first
+            lightGroup.style.display = 'none';
+            darkGroup.style.display = 'none';
+            bothGroup.style.display = 'none';
+            
+            // Show appropriate group based on selection
+            switch (themeSelect.value) {
+                case 'light':
+                    lightGroup.style.display = 'block';
+                    break;
+                case 'dark':
+                    darkGroup.style.display = 'block';
+                    break;
+                case 'all':
+                    bothGroup.style.display = 'block';
+                    break;
+            }
+        }
+
+        function updateComponentThemeFields() {
+            const themeSelect = document.getElementById('component-theme');
+            const themeVars = document.getElementById('component-theme-vars');
+            
+            if (themeSelect.value === 'all') {
+                themeVars.style.display = 'block';
+            } else {
+                themeVars.style.display = 'none';
+            }
+        }
+
+        function updateEditComponentThemeFields() {
+            const themeSelect = document.getElementById('edit-component-theme');
+            const themeVars = document.getElementById('edit-component-theme-vars');
+            
+            if (themeSelect.value === 'all') {
+                themeVars.style.display = 'block';
+            } else {
+                themeVars.style.display = 'none';
+            }
+        }
+
+        function updateEditTokenValueField() {
+            const themeSelect = document.getElementById('edit-token-theme');
+            const lightGroup = document.getElementById('edit-token-value-light-group');
+            const darkGroup = document.getElementById('edit-token-value-dark-group');
+            const bothGroup = document.getElementById('edit-token-value-both-group');
+            
+            // Hide all groups first
+            lightGroup.style.display = 'none';
+            darkGroup.style.display = 'none';
+            bothGroup.style.display = 'none';
+            
+            // Show appropriate group based on selection
+            switch (themeSelect.value) {
+                case 'light':
+                    lightGroup.style.display = 'block';
+                    break;
+                case 'dark':
+                    darkGroup.style.display = 'block';
+                    break;
+                case 'all':
+                    bothGroup.style.display = 'block';
+                    break;
+            }
+        }
+
+        function previewTokenTheme() {
+            const category = document.getElementById('token-category').value;
+            const theme = document.getElementById('token-theme').value;
+            const previewDiv = document.getElementById('token-theme-preview');
+            const previewContent = document.getElementById('token-preview-content');
+            
+            if (!category) {
+                showMessage('Please select a category first', 'error');
+                return;
+            }
+            
+            let lightValue = document.getElementById('token-value-light').value;
+            let darkValue = document.getElementById('token-value-dark').value;
+            let bothValue = document.getElementById('token-value-both').value;
+            
+            let value = '';
+            switch (theme) {
+                case 'light': value = lightValue; break;
+                case 'dark': value = darkValue; break;
+                case 'all': value = bothValue; break;
+            }
+            
+            if (!value) {
+                showMessage('Please enter a value first', 'error');
+                return;
+            }
+            
+            let previewHTML = '';
+            
+            switch (category) {
+                case 'color':
+                    previewHTML = `
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div style="background: ${value}; width: 40px; height: 40px; border-radius: 8px; border: 2px solid var(--border-color);"></div>
+                            <div>
+                                <strong>Color Preview:</strong><br>
+                                <code>${value}</code>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'typography':
+                    previewHTML = `
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div style="font-size: ${value}; font-weight: bold; color: var(--text-primary);">Sample Text</div>
+                            <div>
+                                <strong>Typography Preview:</strong><br>
+                                <code>${value}</code>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'spacing':
+                    previewHTML = `
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div style="width: ${value}; height: 20px; background: var(--accent-color); border-radius: 4px;"></div>
+                            <div>
+                                <strong>Spacing Preview:</strong><br>
+                                <code>${value}</code>
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            previewContent.innerHTML = previewHTML;
+            previewDiv.style.display = 'block';
+        }
+
+        // Stats functions removed
+
+        // Form handling
+        document.getElementById('component-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            if (!authToken) {
+                showMessage('Please log in to create components', 'error');
+                return;
+            }
+
+            const formData = {
+                name: document.getElementById('component-name').value,
+                type: document.getElementById('component-type').value,
+                description: document.getElementById('component-description').value,
+                status: document.getElementById('component-status').value,
+                tags: document.getElementById('component-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag),
+                theme: document.getElementById('component-theme').value,
+                code: {
+                    react: document.getElementById('component-react').value,
+                    html: document.getElementById('component-html').value
+                },
+                styles: {
+                    css: document.getElementById('component-css').value
+                },
+
+                customTheme: {
+                    light: {
+                        bg: document.getElementById('component-light-bg').value,
+                        text: document.getElementById('component-light-text').value,
+                        accent: document.getElementById('component-light-accent').value
+                    },
+                    dark: {
+                        bg: document.getElementById('component-dark-bg').value,
+                        text: document.getElementById('component-dark-text').value,
+                        accent: document.getElementById('component-dark-accent').value
+                    }
+                }
+            };
+
+            try {
+                const response = await fetch('/api/components', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage('Component created successfully!', 'success');
+                    this.reset();
+                    loadComponents();
+                    updateComponentSubnav();
+                } else {
+                    showMessage(data.error || 'Failed to create component', 'error');
+                }
+            } catch (error) {
+                showMessage('Error creating component', 'error');
+            }
+        });
+
+
+
+
+
+        // Component actions
+        async function viewComponent(id) {
+            if (!authToken) return;
+
+            try {
+                const response = await fetch(`/api/components/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const component = await response.json();
+                    showComponentModal(component);
+                }
+            } catch (error) {
+                showMessage('Failed to load component details', 'error');
+            }
+        }
+
+        async function deleteComponent(id) {
+            if (!authToken || !confirm('Are you sure you want to delete this component?')) return;
+
+            try {
+                const response = await fetch(`/api/components/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    showMessage('Component deleted successfully', 'success');
+                    loadComponents();
+                    updateComponentSubnav();
+                } else {
+                    showMessage('Failed to delete component', 'error');
+                }
+            } catch (error) {
+                showMessage('Error deleting component', 'error');
+            }
+        }
+
+        async function editComponent(id) {
+            if (!authToken) return;
+
+            try {
+                const response = await fetch(`/api/components/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const component = await response.json();
+                    showEditComponentModal(component);
+                } else {
+                    showMessage('Failed to load component details', 'error');
+                }
+            } catch (error) {
+                showMessage('Error loading component details', 'error');
+            }
+        }
+
+        function showEditComponentModal(component) {
+            console.log('Opening edit component modal for:', component.name);
+            console.log('Component data:', component);
+            
+            document.getElementById('edit-component-id').value = component._id;
+            document.getElementById('edit-component-name').value = component.name;
+            document.getElementById('edit-component-type').value = component.type;
+            document.getElementById('edit-component-description').value = component.description || '';
+            document.getElementById('edit-component-status').value = component.status || 'draft';
+            document.getElementById('edit-component-tags').value = component.tags ? component.tags.join(', ') : '';
+            document.getElementById('edit-component-theme').value = component.theme || 'all';
+            
+            // Fix the code field mappings
+            document.getElementById('edit-component-react').value = component.code?.react || '';
+            document.getElementById('edit-component-css').value = component.styles?.css || '';
+            document.getElementById('edit-component-html').value = component.code?.html || '';
+            
+            // Populate custom theme variables if they exist
+            if (component.customTheme) {
+                document.getElementById('edit-component-light-bg').value = component.customTheme.light?.bg || '';
+                document.getElementById('edit-component-light-text').value = component.customTheme.light?.text || '';
+                document.getElementById('edit-component-light-accent').value = component.customTheme.light?.accent || '';
+                document.getElementById('edit-component-dark-bg').value = component.customTheme.dark?.bg || '';
+                document.getElementById('edit-component-dark-text').value = component.customTheme.dark?.text || '';
+                document.getElementById('edit-component-dark-accent').value = component.customTheme.dark?.accent || '';
+            }
+            
+            // Update theme fields visibility
+            updateEditComponentThemeFields();
+            
+            const modal = document.getElementById('editComponentModal');
+            if (modal) {
+                modal.style.display = 'block';
+                console.log('Modal displayed successfully');
+            } else {
+                console.error('Edit component modal not found');
+            }
+        }
+
+        // Modal functions
+        function showComponentModal(component) {
+            const modal = document.getElementById('component-modal');
+            const content = document.getElementById('modal-content');
+            
+            content.innerHTML = `
+                <h2>${component.name}</h2>
+                <p><strong>Type:</strong> ${component.type}</p>
+                <p><strong>Status:</strong> ${component.status}</p>
+                <p><strong>Description:</strong> ${component.description || 'No description'}</p>
+                
+                ${component.tags && component.tags.length > 0 ? `
+                    <p><strong>Tags:</strong> ${component.tags.join(', ')}</p>
+                ` : ''}
+                
+
+                
+                ${component.code && component.code.react ? `
+                    <h3>React Code:</h3>
+                    ${createCodeBlock(component.code.react, 'React')}
+                ` : ''}
+                
+                ${component.styles && component.styles.css ? `
+                    <h3>CSS:</h3>
+                    ${createCodeBlock(component.styles.css, 'CSS')}
+                ` : ''}
+            `;
+            
+            modal.style.display = 'block';
+        }
+
+        function closeComponentModal() {
+            document.getElementById('component-modal').style.display = 'none';
+        }
+
+        // Toast notification system
+        function showToast(title, message, type = 'info', duration = 5000) {
+            const toastContainer = document.getElementById('toast-container');
+            
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const iconMap = {
+                error: 'alert-circle',
+                success: 'check-circle',
+                info: 'info'
+            };
+            
+            toast.innerHTML = `
+                <i data-lucide="${iconMap[type] || 'info'}" class="toast-icon"></i>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">
+                    <i data-lucide="x"></i>
+                </button>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+            
+            // Show toast with animation
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 100);
+            
+            // Auto-remove toast
+            if (duration > 0) {
+                setTimeout(() => {
+                    if (toast.parentElement) {
+                        toast.classList.remove('show');
+                        setTimeout(() => {
+                            if (toast.parentElement) {
+                                toast.remove();
+                            }
+                        }, 300);
+                    }
+                }, duration);
+            }
+        }
+
+        // Utility functions
+        function showMessage(message, type = 'info') {
+            // Convert old showMessage calls to new toast system
+            const titleMap = {
+                error: 'Error',
+                success: 'Success',
+                info: 'Info'
+            };
+            
+            showToast(titleMap[type] || 'Info', message, type);
+        }
+
+        function escapeHtml(text) {
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+        }
+
+
+
+        // Dashboard tab switching
+        function switchDashboardTab(tabName) {
+            console.log('switchDashboardTab function exists and called with tabName:', tabName);
+            
+            // Update sidebar nav items
+            document.querySelectorAll('.sidebar-nav-item').forEach(item => item.classList.remove('active'));
+            event.target.closest('.sidebar-nav-item').classList.add('active');
+            
+            // Show/hide component subnavigation
+            const componentSubnav = document.getElementById('component-subnav');
+            const tokenSubnav = document.getElementById('token-subnav');
+            
+            if (tabName === 'components') {
+                componentSubnav.style.display = 'block';
+                tokenSubnav.style.display = 'none';
+                updateComponentSubnav();
+            } else if (tabName === 'tokens') {
+                componentSubnav.style.display = 'none';
+                tokenSubnav.style.display = 'block';
+                // Don't call updateTokenSubnav here - it will be called after loadTokens()
+            } else {
+                componentSubnav.style.display = 'none';
+                tokenSubnav.style.display = 'none';
+            }
+            
+            // Update tab content
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById(tabName + '-tab').classList.add('active');
+            
+            // Update dashboard header
+            const title = document.getElementById('dashboard-title');
+            const subtitle = document.getElementById('dashboard-subtitle');
+            
+            if (tabName === 'components') {
+                title.textContent = 'Component Library';
+                subtitle.textContent = 'Create, manage, and organize your design system components';
+                document.getElementById('components-container').style.display = 'block';
+                document.getElementById('tokens-container').style.display = 'none';
+                loadComponents();
+            } else if (tabName === 'tokens') {
+                console.log('Switching to tokens tab');
+                title.textContent = 'Design Tokens';
+                subtitle.textContent = 'Manage colors, typography, and spacing tokens';
+                console.log('Updated dashboard title to:', title.textContent);
+                document.getElementById('components-container').style.display = 'none';
+                document.getElementById('tokens-container').style.display = 'block';
+                console.log('About to call loadTokens()');
+                loadTokens();
+                updateTokenSubnav();
+            }
+        }
+
+        function refreshContent() {
+            const activeNavItem = document.querySelector('.sidebar-nav-item.active');
+            if (activeNavItem && activeNavItem.textContent.toLowerCase().includes('components')) {
+                loadComponents();
+                updateComponentSubnav();
+            } else {
+                loadTokens();
+                updateTokenSubnav();
+            }
+        }
+
+        // Update component subnavigation
+        function updateComponentSubnav() {
+            const componentList = document.getElementById('component-list');
+            const components = window.components || [];
+            
+            if (components.length === 0) {
+                componentList.innerHTML = '<div style="color: var(--text-secondary); font-size: 0.8rem; padding: 8px 12px;">No components yet</div>';
+                return;
+            }
+            
+            componentList.innerHTML = components.map(component => {
+                return `
+                    <div class="component-nav-item" onclick="scrollToComponent('${component._id}')" title="${component.name}">
+                        <span class="component-name">${component.name}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Scroll to specific component
+        function scrollToComponent(componentId) {
+            const componentElement = document.querySelector(`[data-component-id="${componentId}"]`);
+            if (componentElement) {
+                componentElement.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+                
+                // Highlight the component briefly
+                componentElement.style.border = '2px solid var(--accent-color)';
+                setTimeout(() => {
+                    componentElement.style.border = '1px solid var(--border-color)';
+                }, 2000);
+            }
+        }
+
+        // Update token subnavigation
+        function updateTokenSubnav() {
+            const tokenCategories = document.getElementById('token-categories');
+            const tokens = window.tokens || [];
+            
+            console.log('updateTokenSubnav called with tokens:', tokens.length);
+            console.log('Token categories:', tokens.map(t => t.category));
+            console.log('tokenCategories element:', tokenCategories);
+            
+            if (tokens.length === 0) {
+                tokenCategories.innerHTML = '<div style="color: var(--text-secondary); font-size: 0.8rem; padding: 8px 12px;">No tokens yet</div>';
+                return;
+            }
+            
+            // Group tokens by category
+            const categories = {
+                color: { tokens: [], icon: 'palette' },
+                spacing: { tokens: [], icon: 'move' },
+                typography: { tokens: [], icon: 'type' },
+                elevation: { tokens: [], icon: 'layers' },
+                corners: { tokens: [], icon: 'corner-down-right' }
+            };
+            
+            tokens.forEach(token => {
+                const category = token.category.toLowerCase();
+                if (categories[category]) {
+                    categories[category].tokens.push(token);
+                } else {
+                    // Default to color if category doesn't match
+                    categories.color.tokens.push(token);
+                }
+            });
+
+            // Sort tokens within each category by numerical value
+            Object.values(categories).forEach(categoryData => {
+                categoryData.tokens.sort((a, b) => {
+                    const aValue = extractNumericValue(a.value);
+                    const bValue = extractNumericValue(b.value);
+                    
+                    if (aValue !== null && bValue !== null) {
+                        return aValue - bValue;
+                    }
+                    
+                    // If not numerical, sort alphabetically by name
+                    return a.name.localeCompare(b.name);
+                });
+            });
+            
+            // Build HTML for each category
+            const categoriesHTML = Object.entries(categories).map(([categoryName, categoryData]) => {
+                if (categoryData.tokens.length === 0) return '';
+                
+                const categoryIcon = categoryData.icon;
+                const tokenItems = categoryData.tokens.map(token => {
+                    const previewColor = getTokenPreviewColor(token);
+                    const isColorCategory = categoryName.toLowerCase() === 'color';
+                    return `
+                        <div class="token-nav-item" onclick="scrollToToken('${token._id}')" title="${token.name}">
+                            <i data-lucide="circle"></i>
+                            <span class="token-name">${token.name}</span>
+                            ${isColorCategory ? `<div class="token-preview" style="background-color: ${previewColor};"></div>` : ''}
+                        </div>
+                    `;
+                }).join('');
+                
+                return `
+                    <div class="token-category">
+                        <div class="token-category-header" onclick="toggleTokenCategory(this.parentElement)">
+                            <i data-lucide="${categoryIcon}"></i>
+                            <span>${categoryName.charAt(0).toUpperCase() + categoryName.slice(1)}</span>
+                            <span class="token-count">${categoryData.tokens.length}</span>
+                        </div>
+                        <div class="token-category-items">
+                            ${tokenItems}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            tokenCategories.innerHTML = categoriesHTML;
+            
+            // Initialize Lucide icons
+            lucide.createIcons();
+        }
+
+        // Toggle token category expansion
+        function toggleTokenCategory(categoryElement) {
+            categoryElement.classList.toggle('expanded');
+        }
+
+        // Get preview color for token
+        function getTokenPreviewColor(token) {
+            if (token.category.toLowerCase() === 'color') {
+                return token.value || '#12A594';
+            } else if (token.category.toLowerCase() === 'spacing') {
+                return '#0072F5';
+            } else if (token.category.toLowerCase() === 'typography') {
+                return '#FFB224';
+            } else if (token.category.toLowerCase() === 'elevation') {
+                return '#45A557';
+            } else if (token.category.toLowerCase() === 'corners') {
+                return '#EA3E83';
+            }
+            return '#12A594';
+        }
+
+        // Scroll to specific token
+        function scrollToToken(tokenId) {
+            const tokenElement = document.querySelector(`[data-token-id="${tokenId}"]`);
+            if (tokenElement) {
+                tokenElement.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+                
+                // Highlight the token briefly
+                tokenElement.style.border = '2px solid var(--accent-color)';
+                setTimeout(() => {
+                    tokenElement.style.border = '1px solid var(--border-color)';
+                }, 2000);
+            }
+        }
+
+        // Token management functions
+        function setupTokenForm() {
+            document.getElementById('token-form').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                if (!authToken) {
+                    showMessage('Please log in to create tokens', 'error');
+                    return;
+                }
+
+                const theme = document.getElementById('token-theme').value;
+                let value = '';
+                
+                // Get value based on theme selection
+                switch (theme) {
+                    case 'light':
+                        value = document.getElementById('token-value-light').value;
+                        break;
+                    case 'dark':
+                        value = document.getElementById('token-value-dark').value;
+                        break;
+                    case 'all':
+                        value = document.getElementById('token-value-both').value;
+                        break;
+                }
+                
+                const formData = {
+                    name: document.getElementById('token-name').value,
+                    category: document.getElementById('token-category').value,
+                    value: value,
+                    description: document.getElementById('token-description').value,
+                    tags: document.getElementById('token-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag),
+                    status: document.getElementById('token-status').value,
+                    theme: theme,
+                    lightValue: document.getElementById('token-value-light').value,
+                    darkValue: document.getElementById('token-value-dark').value
+                };
+
+                try {
+                    const response = await fetch('/api/tokens', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${authToken}`
+                        },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showMessage('Token created successfully!', 'success');
+                        this.reset();
+                        loadTokens();
+                        updateTokenSubnav();
+                    } else {
+                        showMessage(data.error || 'Failed to create token', 'error');
+                    }
+                } catch (error) {
+                    showMessage('Error creating token', 'error');
+                }
+            });
+        }
+
+        async function loadTokens() {
+            const container = document.getElementById('tokens-container');
+            console.log('loadTokens called, container:', container);
+            console.log('Auth token present:', !!authToken);
+            
+            // Prevent duplicate loading
+            if (window.isLoadingTokens) {
+                console.log('loadTokens already in progress, skipping...');
+                return;
+            }
+            window.isLoadingTokens = true;
+            
+            if (!authToken) {
+                container.innerHTML = '<div class="loading">Please log in to view tokens</div>';
+                window.isLoadingTokens = false;
+                return;
+            }
+
+            try {
+                console.log('Making API call to /api/tokens with auth token:', authToken ? 'present' : 'missing');
+                const response = await fetch('/api/tokens?limit=200', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                console.log('API response status:', response.status);
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Raw API response:', data);
+                    
+                    // Handle both array and object responses
+                    let tokens;
+                    if (Array.isArray(data)) {
+                        tokens = data;
+                        console.log('Tokens loaded (array):', tokens.length);
+                    } else if (data.tokens && Array.isArray(data.tokens)) {
+                        tokens = data.tokens;
+                        console.log('Tokens loaded (object):', tokens.length);
+                    } else {
+                        console.error('Invalid API response format:', data);
+                        container.innerHTML = '<div class="error">Invalid API response format</div>';
+                        return;
+                    }
+                    
+                    console.log('Token categories loaded:', tokens.map(t => t.category));
+                    console.log('Sample tokens:', tokens.slice(0, 3).map(t => ({ name: t.name, category: t.category })));
+                    
+                    // Check for duplicate tokens
+                    const tokenIds = tokens.map(t => t._id);
+                    const uniqueIds = new Set(tokenIds);
+                    if (tokenIds.length !== uniqueIds.size) {
+                        console.warn('Duplicate tokens detected! Total:', tokenIds.length, 'Unique:', uniqueIds.size);
+                        // Remove duplicates based on _id
+                        const uniqueTokens = tokens.filter((token, index) => tokenIds.indexOf(token._id) === index);
+                        console.log('Removed duplicates, now have:', uniqueTokens.length, 'tokens');
+                        displayTokens(uniqueTokens);
+                    } else {
+                        displayTokens(tokens);
+                    }
+                    updateTokenSubnav();
+                } else {
+                    console.error('API call failed with status:', response.status);
+                    container.innerHTML = '<div class="error">Failed to load tokens</div>';
+                }
+            } catch (error) {
+                console.error('Error in loadTokens:', error);
+                container.innerHTML = '<div class="error">Error loading tokens</div>';
+            } finally {
+                window.isLoadingTokens = false;
+            }
+        }
+
+        function displayTokens(tokens) {
+            const container = document.getElementById('tokens-container');
+            console.log('displayTokens called with', tokens.length, 'tokens');
+            console.log('Container:', container);
+            console.log('First 3 token names:', tokens.slice(0, 3).map(t => t.name));
+            
+            // Store tokens globally for subnavigation
+            window.tokens = tokens;
+            
+            if (tokens.length === 0) {
+                container.innerHTML = '<div class="loading">No tokens found</div>';
+                return;
+            }
+
+            // Sort tokens by category and then by numerical value
+            const sortedTokens = sortTokensByCategoryAndValue(tokens);
+
+            // Generate filter chips
+            const filterChips = generateFilterChips(sortedTokens);
+
+            // Add visual separators between categories
+            let currentCategory = '';
+            const tableRows = [];
+            
+            sortedTokens.forEach(token => {
+                // Add separator if category changes
+                if (token.category !== currentCategory) {
+                    if (currentCategory !== '') {
+                        tableRows.push('<tr class="category-separator"><td colspan="7"></td></tr>');
+                    }
+                    currentCategory = token.category;
+                }
+                
+                tableRows.push(`
+                    <tr data-token-id="${token._id}" data-category="${token.category}">
+                        <td>
+                            ${generateTokenExample(token)}
+                        </td>
+                        <td>
+                            <div class="token-name">${token.name}</div>
+                            ${token.description ? `<div style="color: var(--text-secondary); font-size: 12px; margin-top: 4px;">${token.description}</div>` : ''}
+                        </td>
+                        <td>
+                            <div class="token-value-container">
+                                <span class="token-value">${token.value}</span>
+                                <button class="token-value-copy-btn" onclick="copyTokenValue(this)" title="Copy value">
+                                    <i data-lucide="copy" style="width: 12px; height: 12px;"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <td>
+                            ${generateCategoryBadge(token.category)}
+                        </td>
+                        <td>
+                            ${token.category === 'color' ? (token.theme || 'all') : '-'}
+                        </td>
+                        <!-- Status column removed -->
+                        <td>
+                            <div class="token-actions">
+                                <button class="btn btn-primary-outline btn-sm" onclick="editToken('${token._id}')">Edit</button>
+                            </div>
+                        </td>
+                    </tr>
+                `);
+            });
+
+            const tableHTML = `
+                <div class="tokens-section">
+                    <div class="tokens-header">
+                        <h2>Design Tokens (${tokens.length})</h2>
+                    </div>
+                    ${filterChips}
+                    <div class="theme-filter-section">
+                        <div class="theme-filter-buttons">
+                            <button class="theme-filter-btn" onclick="filterTokensByTheme('all')" data-theme="all">
+                                <i data-lucide="grid"></i>
+                                <span>All Themes</span>
+                            </button>
+                            <button class="theme-filter-btn" onclick="filterTokensByTheme('light')" data-theme="light">
+                                <i data-lucide="sun"></i>
+                                <span>Light Mode</span>
+                            </button>
+                            <button class="theme-filter-btn" onclick="filterTokensByTheme('dark')" data-theme="dark">
+                                <i data-lucide="moon"></i>
+                                <span>Dark Mode</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="tokens-table-container">
+                        <table class="tokens-table">
+                            <thead>
+                                <tr>
+                                    <th>Example</th>
+                                    <th>Token</th>
+                                    <th>Value</th>
+                                    <th>Category</th>
+                                    <th>Theme</th>
+                                    <!-- Status header removed -->
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tableRows.join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = tableHTML;
+            
+            // Initialize Lucide icons for filter chips and theme filter buttons
+            lucide.createIcons();
+            console.log('Theme filter buttons initialized in displayTokens');
+            
+            // Debug: Log token themes for verification
+            console.log('=== Token Theme Debug ===');
+            tokens.forEach(token => {
+                console.log(`Token: ${token.name}, Theme: ${token.theme || 'all'}`);
+            });
+            console.log('=== End Token Theme Debug ===');
+            
+            // Ensure all tokens are visible initially (no filtering applied)
+            console.log('Ensuring all tokens are visible initially...');
+            const allRows = document.querySelectorAll('.tokens-table tbody tr');
+            let visibleCount = 0;
+            let separatorCount = 0;
+            allRows.forEach(row => {
+                if (row.classList.contains('category-separator')) {
+                    separatorCount++;
+                } else {
+                    row.style.display = '';
+                    visibleCount++;
+                }
+            });
+            console.log(`Initial display: ${visibleCount} tokens visible, ${separatorCount} separators`);
+            console.log(`Total tokens loaded: ${tokens.length}`);
+            
+            // Update separator visibility
+            updateSeparatorVisibility();
+            
+            // Debug: Check if any filters are active
+            const activeCategoryChip = document.querySelector('.filter-chip.active');
+            const activeThemeBtn = document.querySelector('.theme-filter-btn.active');
+            console.log(`Active category chip: ${activeCategoryChip ? activeCategoryChip.getAttribute('data-category') : 'none'}`);
+            console.log(`Active theme button: ${activeThemeBtn ? activeThemeBtn.getAttribute('data-theme') : 'none'}`);
+            
+            // Ensure all tokens are visible on initial load (no filters applied)
+            console.log('=== Initial Load: Ensuring all tokens are visible ===');
+            const allTokenRows = document.querySelectorAll('.tokens-table tbody tr:not(.category-separator)');
+            let initialVisibleCount = 0;
+            allTokenRows.forEach(row => {
+                row.style.display = '';
+                initialVisibleCount++;
+            });
+            console.log(`Initial load: ${initialVisibleCount} tokens made visible`);
+            console.log('=== End Initial Load ===');
+        }
+
+        function sortTokensByCategoryAndValue(tokens) {
+            // Define category order
+            const categoryOrder = ['color', 'typography', 'spacing', 'elevation', 'corners'];
+            
+            return tokens.sort((a, b) => {
+                // First sort by category
+                const aIndex = categoryOrder.indexOf(a.category);
+                const bIndex = categoryOrder.indexOf(b.category);
+                
+                if (aIndex !== bIndex) {
+                    return aIndex - bIndex;
+                }
+                
+                // Within the same category, sort by numerical value
+                const aValue = extractNumericValue(a.value);
+                const bValue = extractNumericValue(b.value);
+                
+                if (aValue !== null && bValue !== null) {
+                    return aValue - bValue;
+                }
+                
+                // If not numerical, sort alphabetically by name
+                return a.name.localeCompare(b.name);
+            });
+        }
+
+        function extractNumericValue(value) {
+            // Extract numeric value from token value
+            const match = value.match(/(\d+(?:\.\d+)?)/);
+            return match ? parseFloat(match[1]) : null;
+        }
+
+        function generateCategoryBadge(category) {
+            // Define category icons and labels
+            const categoryConfig = {
+                color: { icon: 'palette', label: 'Color' },
+                typography: { icon: 'type', label: 'Typography' },
+                spacing: { icon: 'move', label: 'Spacing' },
+                elevation: { icon: 'layers', label: 'Elevation' },
+                corners: { icon: 'corner-down-right', label: 'Corners' }
+            };
+
+            const config = categoryConfig[category] || { icon: 'circle', label: category };
+            
+            return `
+                <span class="category-badge ${category}">
+                    <i data-lucide="${config.icon}"></i>
+                    <span>${config.label}</span>
+                </span>
+            `;
+        }
+
+
+
+        function generateFilterChips(tokens) {
+            // Count tokens by category
+            const categoryCounts = tokens.reduce((acc, token) => {
+                acc[token.category] = (acc[token.category] || 0) + 1;
+                return acc;
+            }, {});
+
+            // Define category icons and colors
+            const categoryConfig = {
+                color: { icon: 'palette', label: 'Colors' },
+                typography: { icon: 'type', label: 'Typography' },
+                spacing: { icon: 'move', label: 'Spacing' },
+                elevation: { icon: 'layers', label: 'Elevation' },
+                corners: { icon: 'corner-down-right', label: 'Corners' }
+            };
+
+            const chipsHTML = Object.entries(categoryCounts).map(([category, count]) => {
+                const config = categoryConfig[category] || { icon: 'circle', label: category };
+                return `
+                    <div class="filter-chip" onclick="filterTokensByCategory('${category}')" data-category="${category}">
+                        <i data-lucide="${config.icon}"></i>
+                        <span>${config.label}</span>
+                        <span class="chip-count">${count}</span>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="filter-chips">
+                    <div class="filter-chip" onclick="filterTokensByCategory('all')" data-category="all">
+                        <i data-lucide="grid"></i>
+                        <span>All</span>
+                        <span class="chip-count">${tokens.length}</span>
+                    </div>
+                    ${chipsHTML}
+                </div>
+            `;
+        }
+
+        function filterTokensByCategory(category) {
+            console.log(`Filtering by category: ${category}`);
+            
+            // Update active chip
+            document.querySelectorAll('.filter-chip').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            const targetChip = document.querySelector(`[data-category="${category}"]`);
+            if (targetChip) {
+                targetChip.classList.add('active');
+            }
+
+            // Get current theme filter - handle case where theme buttons might not exist yet
+            const activeThemeBtn = document.querySelector('.theme-filter-btn.active');
+            const currentTheme = activeThemeBtn ? activeThemeBtn.getAttribute('data-theme') : 'all';
+            console.log(`Current theme filter: ${currentTheme}`);
+
+            // Filter table rows based on category and theme
+            const tableRows = document.querySelectorAll('.tokens-table tbody tr');
+            let visibleCount = 0;
+            
+            if (tableRows.length === 0) {
+                console.log('No table rows found for filtering');
+                return;
+            }
+            
+            tableRows.forEach(row => {
+                // Skip separator rows
+                if (row.classList.contains('category-separator')) {
+                    return;
+                }
+                
+                const rowCategory = row.getAttribute('data-category');
+                const tokenId = row.getAttribute('data-token-id');
+                const token = window.tokens.find(t => t._id === tokenId);
+                
+                console.log(`Category filter - Processing row: category="${rowCategory}", tokenId="${tokenId}", token="${token ? token.name : 'not found'}", theme="${token ? (token.theme || 'all') : 'unknown'}"`);
+                
+                // Check category filter first
+                let categoryMatch = category === 'all' || rowCategory === category;
+                
+                if (!categoryMatch) {
+                    row.style.display = 'none';
+                    return;
+                }
+                
+                // Then check theme filter
+                if (currentTheme === 'all') {
+                    row.style.display = '';
+                    visibleCount++;
+                } else if (token) {
+                    const tokenTheme = token.theme || 'all';
+                    let themeMatch = false;
+                    
+                    if (currentTheme === 'light' && (tokenTheme === 'light' || tokenTheme === 'all')) {
+                        themeMatch = true;
+                    } else if (currentTheme === 'dark' && (tokenTheme === 'dark' || tokenTheme === 'all')) {
+                        themeMatch = true;
+                    }
+                    
+                    if (themeMatch) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                } else {
+                    row.style.display = '';
+                    visibleCount++;
+                }
+            });
+
+            console.log(`Category filter "${category}" with theme "${currentTheme}" - ${visibleCount} tokens visible`);
+            
+            // Debug: Log all tokens and their categories
+            console.log('=== All Tokens by Category Debug ===');
+            window.tokens.forEach(token => {
+                console.log(`Token: ${token.name}, Category: ${token.category}, Theme: ${token.theme || 'all'}`);
+            });
+            console.log('=== End All Tokens by Category Debug ===');
+            
+            // Update separator visibility
+            updateSeparatorVisibility();
+        }
+
+        function filterTokensByTheme(theme) {
+            console.log(`Filtering by theme: ${theme}`);
+            
+            // Update active theme button
+            document.querySelectorAll('.theme-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const targetBtn = document.querySelector(`[data-theme="${theme}"]`);
+            if (targetBtn) {
+                targetBtn.classList.add('active');
+            }
+
+            // Get current category filter
+            const activeCategoryChip = document.querySelector('.filter-chip.active');
+            const currentCategory = activeCategoryChip ? activeCategoryChip.getAttribute('data-category') : 'all';
+            console.log(`Current category filter: ${currentCategory}`);
+            console.log(`Active category chip:`, activeCategoryChip);
+            console.log(`All category chips:`, document.querySelectorAll('.filter-chip'));
+
+            // Filter table rows based on theme and category
+            const tableRows = document.querySelectorAll('.tokens-table tbody tr');
+            let visibleCount = 0;
+            let lightTokens = 0;
+            let darkTokens = 0;
+            let bothTokens = 0;
+            
+            if (tableRows.length === 0) {
+                console.log('No table rows found for theme filtering');
+                return;
+            }
+            
+            tableRows.forEach(row => {
+                // Skip separator rows
+                if (row.classList.contains('category-separator')) {
+                    return;
+                }
+                
+                const rowCategory = row.getAttribute('data-category');
+                const tokenId = row.getAttribute('data-token-id');
+                const token = window.tokens.find(t => t._id === tokenId);
+                
+                console.log(`Processing row: category="${rowCategory}", tokenId="${tokenId}", token="${token ? token.name : 'not found'}", theme="${token ? (token.theme || 'all') : 'unknown'}"`);
+                
+                // Check category filter first
+                let categoryMatch = currentCategory === 'all' || rowCategory === currentCategory;
+                console.log(`Category check: rowCategory="${rowCategory}", currentCategory="${currentCategory}", categoryMatch=${categoryMatch}`);
+                
+                if (!categoryMatch) {
+                    row.style.display = 'none';
+                    console.log(`Hiding row due to category mismatch`);
+                    return;
+                }
+                
+                // For "All Themes", bypass all theme checks and show the token
+                if (theme === 'all') {
+                    row.style.display = '';
+                    visibleCount++;
+                    console.log(`Showing token ${token ? token.name : 'unknown'} for "All Themes"`);
+                    return;
+                }
+                
+                // Then check theme filter for specific themes
+                if (token) {
+                    const tokenTheme = token.theme || 'all';
+                    console.log(`Token ${token.name}: theme="${tokenTheme}", filter="${theme}"`);
+                    
+                    let shouldShow = false;
+                    
+                    if (theme === 'light' && (tokenTheme === 'light' || tokenTheme === 'all')) {
+                        shouldShow = true;
+                        lightTokens++;
+                    } else if (theme === 'dark' && (tokenTheme === 'dark' || tokenTheme === 'all')) {
+                        shouldShow = true;
+                        darkTokens++;
+                    }
+                    
+                    if (shouldShow) {
+                        row.style.display = '';
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none';
+                    }
+                } else {
+                    // If no token found, show the row
+                    row.style.display = '';
+                    visibleCount++;
+                }
+            });
+
+            console.log(`Theme filter "${theme}" with category "${currentCategory}" - ${visibleCount} tokens visible`);
+            console.log(`Light tokens: ${lightTokens}, Dark tokens: ${darkTokens}`);
+            
+            // Debug: Log all tokens and their themes
+            console.log('=== All Tokens Debug ===');
+            window.tokens.forEach(token => {
+                console.log(`Token: ${token.name}, Category: ${token.category}, Theme: ${token.theme || 'all'}`);
+            });
+            console.log('=== End All Tokens Debug ===');
+            
+            // Update separator visibility
+            updateSeparatorVisibility();
+        }
+
+        function updateSeparatorVisibility() {
+            const separators = document.querySelectorAll('.category-separator');
+            separators.forEach(separator => {
+                const nextRow = separator.nextElementSibling;
+                if (nextRow && nextRow.style.display === 'none') {
+                    separator.style.display = 'none';
+                } else {
+                    separator.style.display = '';
+                }
+            });
+        }
+
+        function generateComponentFilterChips(components) {
+            // Count components by type and status
+            const typeCounts = components.reduce((acc, component) => {
+                acc[component.type] = (acc[component.type] || 0) + 1;
+                return acc;
+            }, {});
+
+            const statusCounts = components.reduce((acc, component) => {
+                acc[component.status] = (acc[component.status] || 0) + 1;
+                return acc;
+            }, {});
+
+            // Define type icons
+            const typeConfig = {
+                button: { icon: 'square', label: 'Buttons' },
+                input: { icon: 'input', label: 'Inputs' },
+                card: { icon: 'credit-card', label: 'Cards' },
+                modal: { icon: 'maximize-2', label: 'Modals' },
+                navigation: { icon: 'navigation', label: 'Navigation' },
+                form: { icon: 'file-text', label: 'Forms' },
+                layout: { icon: 'layout', label: 'Layout' },
+                typography: { icon: 'type', label: 'Typography' },
+                icon: { icon: 'star', label: 'Icons' },
+                other: { icon: 'circle', label: 'Other' }
+            };
+
+            const statusConfig = {
+                draft: { icon: 'edit-3', label: 'Draft' },
+                active: { icon: 'check-circle', label: 'Active' },
+                deprecated: { icon: 'x-circle', label: 'Deprecated' }
+            };
+
+            const typeChips = Object.entries(typeCounts).map(([type, count]) => {
+                const config = typeConfig[type] || { icon: 'circle', label: type };
+                return `
+                    <div class="filter-chip" onclick="filterComponentsByType('${type}')" data-type="${type}">
+                        <span>${config.label}</span>
+                        <span class="chip-count">${count}</span>
+                    </div>
+                `;
+            }).join('');
+
+            // Status chips removed
+
+            return `
+                <div class="filter-chips">
+                    <div class="filter-chip active" onclick="filterComponentsByType('all')" data-type="all">
+                        <i data-lucide="grid"></i>
+                        <span>All Types</span>
+                        <span class="chip-count">${components.length}</span>
+                    </div>
+                    ${typeChips}
+                    <!-- Status filter section removed -->
+                </div>
+            `;
+        }
+
+        function filterComponentsByType(type) {
+            // Update active chip
+            document.querySelectorAll('.filter-chip[data-type]').forEach(chip => {
+                chip.classList.remove('active');
+            });
+            document.querySelector(`[data-type="${type}"]`).classList.add('active');
+
+            // Filter component cards
+            const componentCards = document.querySelectorAll('.component-card');
+            componentCards.forEach(card => {
+                if (type === 'all') {
+                    card.style.display = '';
+                } else {
+                    const cardType = card.getAttribute('data-type');
+                    if (cardType === type) {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        // Status filtering function removed
+
+        function generateTokenExample(token) {
+            switch (token.category) {
+                case 'color':
+                    return `<div class="token-example" style="background-color: ${token.value};"></div>`;
+                case 'typography':
+                    return `<div style="font-size: ${token.value}; line-height: 1; color: var(--text-primary);">Aa</div>`;
+                case 'spacing':
+                    const size = parseInt(token.value) || 16;
+                    return `<div class="token-example" style="width: ${Math.min(size, 40)}px; height: 8px; background: var(--accent-color);"></div>`;
+                default:
+                    return `<div class="token-example" style="background: var(--code-bg); border: 2px dashed var(--border-color);"></div>`;
+            }
+        }
+
+        // Token stats functions removed
+
+        // Import/Export functions
+        async function uploadTokens() {
+            const fileInput = document.getElementById('json-file');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showMessage('Please select a JSON file', 'error');
+                return;
+            }
+
+            if (!authToken) {
+                showMessage('Please log in to upload tokens', 'error');
+                return;
+            }
+
+            try {
+                const text = await file.text();
+                const jsonData = JSON.parse(text);
+                
+                if (!jsonData.tokens || !Array.isArray(jsonData.tokens)) {
+                    showMessage('Invalid JSON format. Expected { "tokens": [...] }', 'error');
+                    return;
+                }
+
+                const response = await fetch('/api/tokens/upload', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage(`Upload complete! ${data.results.success.length} created, ${data.results.skipped.length} skipped, ${data.results.errors.length} errors`, 'success');
+                    fileInput.value = '';
+                    loadTokens();
+                } else {
+                    showMessage(data.error || 'Upload failed', 'error');
+                }
+            } catch (error) {
+                showMessage('Error uploading tokens: ' + error.message, 'error');
+            }
+        }
+
+        async function exportTokens() {
+            if (!authToken) {
+                showMessage('Please log in to export tokens', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/tokens?limit=1000', {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('exportTokens raw response:', data);
+                    
+                    // Handle both array and object responses
+                    let tokens;
+                    if (Array.isArray(data)) {
+                        tokens = data;
+                    } else if (data.tokens && Array.isArray(data.tokens)) {
+                        tokens = data.tokens;
+                    } else {
+                        console.error('Invalid API response format in exportTokens:', data);
+                        showMessage('Invalid API response format', 'error');
+                        return;
+                    }
+                    
+                    const exportData = {
+                        tokens: sortTokensByCategoryAndValue(tokens).map(token => ({
+                            name: token.name,
+                            category: token.category,
+                            value: token.value,
+                            description: token.description || '',
+                            tags: token.tags || []
+                        }))
+                    };
+
+                    const jsonString = JSON.stringify(exportData, null, 2);
+                    const blob = new Blob([jsonString], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `design-tokens-${new Date().toISOString().split('T')[0]}.json`;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                    
+                    showMessage(`Exported ${exportData.tokens.length} tokens successfully!`, 'success');
+                } else {
+                    showMessage('Failed to export tokens', 'error');
+                }
+            } catch (error) {
+                showMessage('Error exporting tokens', 'error');
+            }
+        }
+
+        // Token actions
+        async function viewToken(id) {
+            if (!authToken) return;
+
+            try {
+                const response = await fetch(`/api/tokens/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const token = await response.json();
+                    showTokenModal(token);
+                }
+            } catch (error) {
+                showMessage('Failed to load token details', 'error');
+            }
+        }
+
+        async function deleteToken(id) {
+            if (!authToken || !confirm('Are you sure you want to delete this token?')) return;
+
+            try {
+                const response = await fetch(`/api/tokens/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    showMessage('Token deleted successfully', 'success');
+                    loadTokens();
+                    updateTokenSubnav();
+                } else {
+                    showMessage('Failed to delete token', 'error');
+                }
+            } catch (error) {
+                showMessage('Error deleting token', 'error');
+            }
+        }
+
+        async function editToken(id) {
+            if (!authToken) return;
+
+            try {
+                const response = await fetch(`/api/tokens/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const token = await response.json();
+                    showEditTokenModal(token);
+                } else {
+                    showMessage('Failed to load token details', 'error');
+                }
+            } catch (error) {
+                showMessage('Error loading token details', 'error');
+            }
+        }
+
+        function deleteTokenFromModal() {
+            const tokenId = document.getElementById('edit-token-id').value;
+            const tokenName = document.getElementById('edit-token-name').value;
+            
+            if (confirm(`Are you sure you want to delete the token "${tokenName}"?`)) {
+                deleteToken(tokenId);
+                closeModal('editTokenModal');
+            }
+        }
+
+        function showEditTokenModal(token) {
+            console.log('Opening edit token modal for:', token.name);
+            console.log('Token data:', token);
+            
+            document.getElementById('edit-token-id').value = token._id;
+            document.getElementById('edit-token-name').value = token.name;
+            document.getElementById('edit-token-category').value = token.category;
+            document.getElementById('edit-token-theme').value = token.theme || 'all';
+            document.getElementById('edit-token-description').value = token.description || '';
+            document.getElementById('edit-token-tags').value = token.tags ? token.tags.join(', ') : '';
+            document.getElementById('edit-token-status').value = token.status || 'active';
+            
+            // Populate theme-specific values - ensure all values are preserved
+            document.getElementById('edit-token-value-light').value = token.lightValue || '';
+            document.getElementById('edit-token-value-dark').value = token.darkValue || '';
+            document.getElementById('edit-token-value-both').value = token.value || '';
+            
+            // Update theme fields visibility
+            updateEditTokenValueField();
+            
+            const modal = document.getElementById('editTokenModal');
+            if (modal) {
+                modal.style.display = 'block';
+                console.log('Token modal displayed successfully');
+                
+                // Setup the edit token form event listener
+                const editTokenForm = document.getElementById('edit-token-form');
+                console.log('Edit token form found:', editTokenForm);
+                
+                if (editTokenForm) {
+                    // Remove any existing event listeners to avoid duplicates
+                    const newForm = editTokenForm.cloneNode(true);
+                    editTokenForm.parentNode.replaceChild(newForm, editTokenForm);
+                    
+                    newForm.addEventListener('submit', async function(e) {
+                        console.log('Edit token form submitted!');
+                        console.log('Event type:', e.type);
+                        console.log('Event target:', e.target);
+                        alert('Form submitted!'); // Simple test
+                        e.preventDefault();
+                        
+                        // Simple test - just log the form data
+                        const simpleFormData = {
+                            name: document.getElementById('edit-token-name').value,
+                            category: document.getElementById('edit-token-category').value,
+                            value: document.getElementById('edit-token-value-both').value
+                        };
+                        console.log('Simple form data:', simpleFormData);
+                        alert('Form data: ' + JSON.stringify(simpleFormData));
+                        
+                        if (!authToken) {
+                            showMessage('Please log in to edit tokens', 'error');
+                            return;
+                        }
+
+                        const tokenId = document.getElementById('edit-token-id').value;
+                        const theme = document.getElementById('edit-token-theme').value;
+                        let value = '';
+                        
+                        // Get value based on theme selection
+                        console.log('Theme selected:', theme);
+                        switch (theme) {
+                            case 'light':
+                                value = document.getElementById('edit-token-value-light').value;
+                                console.log('Light value:', value);
+                                break;
+                            case 'dark':
+                                value = document.getElementById('edit-token-value-dark').value;
+                                console.log('Dark value:', value);
+                                break;
+                            case 'all':
+                                value = document.getElementById('edit-token-value-both').value;
+                                console.log('All value:', value);
+                                break;
+                        }
+                        console.log('Final value:', value);
+                        
+                        const formData = {
+                            name: document.getElementById('edit-token-name').value,
+                            category: document.getElementById('edit-token-category').value,
+                            value: value,
+                            description: document.getElementById('edit-token-description').value,
+                            tags: document.getElementById('edit-token-tags').value.split(',').map(tag => tag.trim()).filter(tag => tag),
+                            status: document.getElementById('edit-token-status').value,
+                            theme: theme,
+                            lightValue: document.getElementById('edit-token-value-light').value,
+                            darkValue: document.getElementById('edit-token-value-dark').value
+                        };
+                        
+                        console.log('Form data collected:', formData);
+                        
+                        // Validate required fields
+                        console.log('Validating form data...');
+                        console.log('Name:', formData.name);
+                        console.log('Category:', formData.category);
+                        console.log('Value:', formData.value);
+                        
+                        if (!formData.name || !formData.category || !formData.value) {
+                            console.log('Validation failed!');
+                            showMessage('Name, category, and value are required', 'error');
+                            return;
+                        }
+                        console.log('Validation passed!');
+
+                        try {
+                            console.log('Auth token:', authToken);
+                            console.log('Token ID:', tokenId);
+                            console.log('Sending token update with data:', formData);
+                            const response = await fetch(`/api/tokens/${tokenId}`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${authToken}`
+                                },
+                                body: JSON.stringify(formData)
+                            });
+
+                            console.log('Response status:', response.status);
+                            const data = await response.json();
+                            console.log('Response data:', data);
+
+                            if (response.ok) {
+                                showMessage('Token updated successfully!', 'success');
+                                closeModal('editTokenModal');
+                                loadTokens();
+                                updateTokenSubnav();
+                            } else {
+                                showMessage(data.error || 'Failed to update token', 'error');
+                            }
+                        } catch (error) {
+                            console.error('Token update error:', error);
+                            showMessage('Error updating token', 'error');
+                        }
+                    });
+                    
+                    console.log('Edit token form event listener added successfully');
+                } else {
+                    console.error('Edit token form not found!');
+                }
+            } else {
+                console.error('Edit token modal not found');
+            }
+        }
+
+        function refreshComponents() {
+            loadComponents();
+        }
+
+        // Copy functionality
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showMessage('Copied to clipboard!', 'success');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                showMessage('Failed to copy to clipboard', 'error');
+            });
+        }
+
+        function copyCodeBlock(button) {
+            const codeBlock = button.closest('.code-block');
+            const codeElement = codeBlock.querySelector('code');
+            const text = codeElement.textContent;
+            copyToClipboard(text);
+        }
+
+        function copyTokenValue(button) {
+            const tokenValue = button.closest('.token-value-container').querySelector('.token-value').textContent;
+            copyToClipboard(tokenValue);
+        }
+
+        function createCodeBlock(content, language = '') {
+            return `
+                <div class="code-block">
+                    <div class="code-block-header">
+                        <span class="code-block-title">${language}</span>
+                        <div class="code-block-actions">
+                            <button class="copy-btn" onclick="copyCodeBlock(this)">
+                                <i data-lucide="copy"></i>
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+                    <pre><code>${escapeHtml(content)}</code></pre>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('component-modal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html> 

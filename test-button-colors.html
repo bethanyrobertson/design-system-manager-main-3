@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Button Text Color Test</title>
+    <style>
+        :root {
+            --primary: #A78BFA;
+            --primary-foreground: white;
+        }
+
+        [data-theme="dark"] {
+            --primary: #C4B5FD;
+            --primary-foreground: black;
+        }
+
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        .btn-primary-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px;
+        }
+
+        .btn-primary-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Dark mode button overrides */
+        [data-theme="dark"] .btn-primary {
+            color: black;
+        }
+
+        [data-theme="dark"] .btn-primary:hover {
+            color: black;
+        }
+
+        [data-theme="dark"] .btn-primary-outline:hover {
+            background: var(--primary);
+            color: black;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+        }
+
+        [data-theme="dark"] .theme-toggle {
+            color: black;
+        }
+
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body data-theme="light">
+    <button class="theme-toggle" onclick="toggleTheme()">🌞</button>
+    
+    <h1>Button Text Color Test</h1>
+    
+    <div class="test-section">
+        <h2>Primary Buttons</h2>
+        <button class="btn-primary">Primary Button</button>
+        <button class="btn-primary">Add New Component</button>
+        <button class="btn-primary">Add New Token</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Outline Buttons</h2>
+        <button class="btn-primary-outline">Edit</button>
+        <button class="btn-primary-outline">Preview</button>
+        <button class="btn-primary-outline">Export</button>
+    </div>
+    
+    <div class="test-section">
+        <h2>Expected Results:</h2>
+        <p><strong>Light Mode:</strong> White text on purple background</p>
+        <p><strong>Dark Mode:</strong> Black text on purple background</p>
+    </div>
+
+    <script>
+        function toggleTheme() {
+            const body = document.body;
+            const button = document.querySelector('.theme-toggle');
+            
+            if (body.getAttribute('data-theme') === 'light') {
+                body.setAttribute('data-theme', 'dark');
+                button.textContent = '🌙';
+            } else {
+                body.setAttribute('data-theme', 'light');
+                button.textContent = '🌞';
+            }
+        }
+    </script>
+</body>
+</html> 
