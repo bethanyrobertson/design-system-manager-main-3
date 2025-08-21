@@ -1,0 +1,127 @@
+@import '@radix-ui/themes/styles.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Enhanced design tokens using Radix UI pink accent theme */
+    --background: var(--color-surface);
+    --foreground: var(--gray-12);
+    --card: var(--color-panel-solid);
+    --card-foreground: var(--gray-12);
+    --popover: var(--color-panel-solid);
+    --popover-foreground: var(--gray-12);
+    --primary: var(--pink-9);
+    --primary-foreground: var(--pink-contrast);
+    --secondary: var(--gray-3);
+    --secondary-foreground: var(--gray-12);
+    --muted: var(--gray-3);
+    --muted-foreground: var(--gray-11);
+    --accent: var(--pink-4);
+    --accent-foreground: var(--pink-12);
+    --destructive: var(--red-9);
+    --destructive-foreground: var(--red-contrast);
+    --border: var(--gray-6);
+    --input: var(--gray-6);
+    --ring: var(--pink-8);
+    --radius: 0.5rem;
+    
+    /* Additional Radix UI pink accent color mappings */
+    --color-primary: var(--pink-9);
+    --color-primary-foreground: var(--pink-contrast);
+    --color-secondary: var(--gray-3);
+    --color-secondary-foreground: var(--gray-12);
+    --color-muted: var(--gray-3);
+    --color-muted-foreground: var(--gray-11);
+    --color-accent: var(--pink-4);
+    --color-accent-foreground: var(--pink-12);
+  }
+
+  .dark {
+    --background: var(--color-surface);
+    --foreground: var(--gray-12);
+    --card: var(--color-panel-solid);
+    --card-foreground: var(--gray-12);
+    --popover: var(--color-panel-solid);
+    --popover-foreground: var(--gray-12);
+    --primary: var(--pink-9);
+    --primary-foreground: var(--pink-contrast);
+    --secondary: var(--gray-4);
+    --secondary-foreground: var(--gray-12);
+    --muted: var(--gray-4);
+    --muted-foreground: var(--gray-11);
+    --accent: var(--pink-5);
+    --accent-foreground: var(--pink-12);
+    --destructive: var(--red-9);
+    --destructive-foreground: var(--red-contrast);
+    --border: var(--gray-6);
+    --input: var(--gray-6);
+    --ring: var(--pink-8);
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Enhanced Radix UI pink theme integration */
+  .rt-ThemeRoot {
+    --pink-9: var(--primary);
+    --pink-contrast: var(--primary-foreground);
+    --gray-3: var(--secondary);
+    --gray-12: var(--secondary-foreground);
+    --gray-6: var(--border);
+    --gray-11: var(--muted-foreground);
+    --red-9: var(--destructive);
+    --red-contrast: var(--destructive-foreground);
+  }
+  
+  /* Sidebar enhancements */
+  .sidebar-nav-item {
+    @apply transition-all duration-200 ease-in-out;
+  }
+  
+  .sidebar-nav-item:hover {
+    @apply transform translate-x-1;
+  }
+  
+  /* Card enhancements */
+  .card {
+    @apply bg-card border border-border rounded-lg shadow-sm;
+  }
+  
+  .card:hover {
+    @apply shadow-md transition-shadow duration-200;
+  }
+  
+  /* Button enhancements */
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary text-secondary-foreground hover:bg-secondary/80;
+  }
+  
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+  }
+  
+  @keyframes slideIn {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+}
