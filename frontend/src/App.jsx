@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
-import { Theme, Container, Flex, Box, Text, Button, Separator, Avatar, DropdownMenu, IconButton } from '@radix-ui/themes'
+import { Theme, Container, Flex, Box, Text, Button, Avatar, DropdownMenu, IconButton } from '@radix-ui/themes'
 import { 
   HomeIcon, 
   ColorWheelIcon, 
@@ -11,9 +11,24 @@ import {
   ExitIcon,
   SunIcon,
   MoonIcon,
-  HamburgerMenuIcon
+  HamburgerMenuIcon,
+  PlusIcon
 } from '@radix-ui/react-icons'
 import { componentsAPI, tokensAPI } from './lib/api'
+import { AppSidebar } from '@/components/app-sidebar'
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
+import { Separator } from '@/components/ui/separator'
+import ColorsPage from '@/pages/ColorsPage'
+import TypographyPage from '@/pages/TypographyPage'
+import SpacingPage from '@/pages/SpacingPage'
+import BorderRadiusPage from '@/pages/BorderRadiusPage'
+import BlurPage from '@/pages/BlurPage'
+import ComponentPage from '@/pages/ComponentPage'
+import EditComponentModal from './components/modals/EditComponentModal'
+import DeleteComponentModal from './components/modals/DeleteComponentModal'
+import EditTokenModal from './components/modals/EditTokenModal'
+import DeleteTokenModal from './components/modals/DeleteTokenModal'
 import './App.css'
 
 // Protected Route Component
@@ -26,7 +41,6 @@ const ProtectedRoute = ({ children, isAuthenticated }) => {
 
 // Main Layout Component
 const AppLayout = ({ children, user, onSignout, currentPage, setCurrentPage, theme, setTheme }) => {
-  const navigate = useNavigate()
   const location = useLocation()
 
   useEffect(() => {
@@ -39,101 +53,45 @@ const AppLayout = ({ children, user, onSignout, currentPage, setCurrentPage, the
     else if (path === '/settings') setCurrentPage('settings')
   }, [location, setCurrentPage])
 
-  const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: HomeIcon, path: '/' },
-    { id: 'components', label: 'Components', icon: ColorWheelIcon, path: '/components' },
-    { id: 'tokens', label: 'Design Tokens', icon: CircleIcon, path: '/tokens' },
-    { id: 'documentation', label: 'Documentation', icon: FileTextIcon, path: '/documentation' },
-    { id: 'settings', label: 'Settings', icon: GearIcon, path: '/settings' }
-  ]
-
-  const handleNavClick = (path) => {
-    navigate(path)
+  const getBreadcrumbTitle = () => {
+    switch (currentPage) {
+      case 'dashboard': return 'Dashboard'
+      case 'components': return 'Components'
+      case 'tokens': return 'Design Tokens'
+      case 'documentation': return 'Documentation'
+      case 'settings': return 'Settings'
+      default: return 'Dashboard'
+    }
   }
 
   return (
-    <Flex className="min-h-screen bg-background">
-      {/* Sidebar */}
-      <Box className="w-64 bg-sidebar border-r border-border p-4">
-        <Flex direction="column" className="h-full">
-          {/* Logo */}
-          <Box className="mb-8">
-            <Text size="6" weight="bold" className="text-primary">
-              Design System
-            </Text>
-          </Box>
-
-          {/* Navigation */}
-          <Flex direction="column" gap="2" className="flex-1">
-            {navItems.map((item) => {
-              const Icon = item.icon
-              const isActive = currentPage === item.id
-              
-              return (
-                <Button
-                  key={item.id}
-                  variant={isActive ? "solid" : "ghost"}
-                  className={`w-full justify-start gap-3 h-12 ${
-                    isActive 
-                      ? 'bg-primary text-primary-foreground hover:bg-primary/90' 
-                      : 'hover:bg-accent hover:text-accent-foreground'
-                  }`}
-                  onClick={() => handleNavClick(item.path)}
-                >
-                  <Icon className="w-5 h-5" />
-                  {item.label}
-                </Button>
-              )
-            })}
-          </Flex>
-
-          {/* User Section */}
-          <Box className="mt-auto">
-            <Separator className="mb-4" />
-            <Flex align="center" justify="between" className="mb-4">
-              <Flex align="center" gap="3">
-                <Avatar size="2" fallback={user?.name?.[0] || 'U'} />
-                <Box>
-                  <Text size="2" weight="medium">{user?.name || 'User'}</Text>
-                  <Text size="1" color="gray">{user?.email || 'user@example.com'}</Text>
-                </Box>
-              </Flex>
-            </Flex>
-            
-            {/* Theme Toggle */}
-            <Flex gap="2" className="mb-4">
-              <Button
-                variant="ghost"
-                size="2"
-                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                className="w-full"
-              >
-                {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
-                {theme === 'dark' ? 'Light' : 'Dark'} Mode
-              </Button>
-            </Flex>
-
-            {/* Sign Out */}
-            <Button
-              variant="ghost"
-              size="2"
-              onClick={onSignout}
-              className="w-full text-destructive hover:text-destructive"
-            >
-              <ExitIcon className="w-4 h-4 mr-2" />
-              Sign Out
-            </Button>
-          </Box>
-        </Flex>
-      </Box>
-
-      {/* Main Content */}
-      <Box className="flex-1 overflow-auto">
-        <Container className="p-8">
+    <SidebarProvider>
+      <AppSidebar theme={theme} setTheme={setTheme} />
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12">
+          <div className="flex items-center gap-2 px-4">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 data-[orientation=vertical]:h-4" />
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem className="hidden md:block">
+                  <BreadcrumbLink href="#">
+                    Design System Manager
+                  </BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>{getBreadcrumbTitle()}</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
           {children}
-        </Container>
-      </Box>
-    </Flex>
+        </div>
+      </SidebarInset>
+    </SidebarProvider>
   )
 }
 
@@ -177,6 +135,7 @@ function App() {
 
   console.log('App render - Auth:', isAuthenticated, 'User:', user, 'Page:', currentPage)
 
+  // Skip authentication for now to debug rendering
   return (
     <Theme accentColor="pink" grayColor="gray" appearance={theme}>
       <BrowserRouter>
@@ -192,86 +151,136 @@ function App() {
           <Route 
             path="/" 
             element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <AppLayout 
-                  user={user} 
-                  onSignout={handleSignout}
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
-                  theme={theme}
-                  setTheme={setTheme}
-                >
-                  <Dashboard />
-                </AppLayout>
-              </ProtectedRoute>
+              <AppLayout 
+                user={user} 
+                onSignout={handleSignout}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                theme={theme}
+                setTheme={setTheme}
+              >
+                <Dashboard />
+              </AppLayout>
             } 
           />
           <Route 
-            path="/components" 
+            path="/colors" 
             element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <AppLayout 
-                  user={user} 
-                  onSignout={handleSignout}
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
-                  theme={theme}
-                  setTheme={setTheme}
-                >
-                  <Components />
-                </AppLayout>
-              </ProtectedRoute>
+              <AppLayout 
+                user={user} 
+                onSignout={handleSignout}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                theme={theme}
+                setTheme={setTheme}
+              >
+                <ColorsPage />
+              </AppLayout>
             } 
           />
           <Route 
-            path="/tokens" 
+            path="/typography" 
             element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <AppLayout 
-                  user={user} 
-                  onSignout={handleSignout}
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
-                  theme={theme}
-                  setTheme={setTheme}
-                >
-                  <Tokens />
-                </AppLayout>
-              </ProtectedRoute>
+              <AppLayout 
+                user={user} 
+                onSignout={handleSignout}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                theme={theme}
+                setTheme={setTheme}
+              >
+                <TypographyPage />
+              </AppLayout>
+            } 
+          />
+          <Route 
+            path="/spacing" 
+            element={
+              <AppLayout 
+                user={user} 
+                onSignout={handleSignout}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                theme={theme}
+                setTheme={setTheme}
+              >
+                <SpacingPage />
+              </AppLayout>
+            } 
+          />
+          <Route 
+            path="/border-radius" 
+            element={
+              <AppLayout 
+                user={user} 
+                onSignout={handleSignout}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                theme={theme}
+                setTheme={setTheme}
+              >
+                <BorderRadiusPage />
+              </AppLayout>
+            } 
+          />
+          <Route 
+            path="/blur" 
+            element={
+              <AppLayout 
+                user={user} 
+                onSignout={handleSignout}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                theme={theme}
+                setTheme={setTheme}
+              >
+                <BlurPage />
+              </AppLayout>
+            } 
+          />
+          <Route 
+            path="/component/:componentId" 
+            element={
+              <AppLayout 
+                user={user} 
+                onSignout={handleSignout}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                theme={theme}
+                setTheme={setTheme}
+              >
+                <ComponentPage />
+              </AppLayout>
             } 
           />
           <Route 
             path="/documentation" 
             element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <AppLayout 
-                  user={user} 
-                  onSignout={handleSignout}
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
-                  theme={theme}
-                  setTheme={setTheme}
-                >
-                  <Documentation />
-                </AppLayout>
-              </ProtectedRoute>
+              <AppLayout 
+                user={user} 
+                onSignout={handleSignout}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                theme={theme}
+                setTheme={setTheme}
+              >
+                <Documentation />
+              </AppLayout>
             } 
           />
           <Route 
             path="/settings" 
             element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <AppLayout 
-                  user={user} 
-                  onSignout={handleSignout}
-                  currentPage={currentPage}
-                  setCurrentPage={setCurrentPage}
-                  theme={theme}
-                  setTheme={setTheme}
-                >
-                  <Settings />
-                </AppLayout>
-              </ProtectedRoute>
+              <AppLayout 
+                user={user} 
+                onSignout={handleSignout}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+                theme={theme}
+                setTheme={setTheme}
+              >
+                <Settings />
+              </AppLayout>
             } 
           />
         </Routes>
@@ -282,20 +291,26 @@ function App() {
 
 // Page Components
 const Dashboard = () => {
+  const navigate = useNavigate()
   const [backendStatus, setBackendStatus] = useState('checking')
   const [frontendStatus, setFrontendStatus] = useState('checking')
+  const [databaseStatus, setDatabaseStatus] = useState('checking')
+  const [apiEndpoints, setApiEndpoints] = useState('checking')
 
   useEffect(() => {
-    // Check backend connection
+    // Check backend connection and get detailed status
     fetch('http://localhost:3000/api/health')
-      .then(response => {
-        if (response.ok) {
-          setBackendStatus('connected')
-        } else {
-          setBackendStatus('error')
-        }
+      .then(response => response.json())
+      .then(data => {
+        setBackendStatus('connected')
+        setDatabaseStatus(data.database === 'connected' ? 'connected' : 'disconnected')
+        setApiEndpoints('available')
       })
-      .catch(() => setBackendStatus('disconnected'))
+      .catch(() => {
+        setBackendStatus('disconnected')
+        setDatabaseStatus('disconnected')
+        setApiEndpoints('unavailable')
+      })
 
     // Check frontend
     setFrontendStatus('running')
@@ -305,9 +320,11 @@ const Dashboard = () => {
     switch (status) {
       case 'connected':
       case 'running':
+      case 'available':
         return <Box className="w-3 h-3 bg-green-500 rounded-full" />
       case 'disconnected':
       case 'error':
+      case 'unavailable':
         return <Box className="w-3 h-3 bg-red-500 rounded-full" />
       default:
         return <Box className="w-3 h-3 bg-yellow-500 rounded-full" />
@@ -317,11 +334,17 @@ const Dashboard = () => {
   const getStatusText = (status) => {
     switch (status) {
       case 'connected':
-      case 'running':
         return 'Connected'
+      case 'running':
+        return 'Running'
+      case 'available':
+        return 'Available'
       case 'disconnected':
-      case 'error':
         return 'Disconnected'
+      case 'error':
+        return 'Error'
+      case 'unavailable':
+        return 'Unavailable'
       default:
         return 'Checking...'
     }
@@ -338,14 +361,24 @@ const Dashboard = () => {
           <Text size="5" weight="semibold" className="mb-4">System Status</Text>
           <Flex direction="column" gap="4">
             <Flex align="center" gap="3">
+              {getStatusIcon(frontendStatus)}
+              <Text size="3">React Frontend</Text>
+              <Text size="2" color="gray">({getStatusText(frontendStatus)})</Text>
+            </Flex>
+            <Flex align="center" gap="3">
               {getStatusIcon(backendStatus)}
-              <Text size="3">Backend API</Text>
+              <Text size="3">Node.js API Server</Text>
               <Text size="2" color="gray">({getStatusText(backendStatus)})</Text>
             </Flex>
             <Flex align="center" gap="3">
-              {getStatusIcon(frontendStatus)}
-              <Text size="3">Frontend</Text>
-              <Text size="2" color="gray">({getStatusText(frontendStatus)})</Text>
+              {getStatusIcon(databaseStatus)}
+              <Text size="3">MongoDB Database</Text>
+              <Text size="2" color="gray">({getStatusText(databaseStatus)})</Text>
+            </Flex>
+            <Flex align="center" gap="3">
+              {getStatusIcon(apiEndpoints)}
+              <Text size="3">REST API Endpoints</Text>
+              <Text size="2" color="gray">({getStatusText(apiEndpoints)})</Text>
             </Flex>
           </Flex>
         </Box>
@@ -353,15 +386,15 @@ const Dashboard = () => {
         <Box className="p-6 bg-card border border-border rounded-lg">
           <Text size="5" weight="semibold" className="mb-4">Quick Actions</Text>
           <Flex gap="3" wrap="wrap">
-            <Button variant="solid" size="3">
+            <Button variant="solid" size="3" onClick={() => navigate('/components')}>
               <ColorWheelIcon className="w-4 h-4 mr-2" />
               View Components
             </Button>
-            <Button variant="outline" size="3">
+            <Button variant="outline" size="3" onClick={() => navigate('/tokens')}>
               <CircleIcon className="w-4 h-4 mr-2" />
               Manage Tokens
             </Button>
-            <Button variant="outline" size="3">
+            <Button variant="outline" size="3" onClick={() => navigate('/documentation')}>
               <FileTextIcon className="w-4 h-4 mr-2" />
               Documentation
             </Button>
@@ -376,27 +409,47 @@ const Components = () => {
   const [components, setComponents] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [activeFilter, setActiveFilter] = useState('all')
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [selectedComponent, setSelectedComponent] = useState(null)
+
+  // Get unique tags from all components for filter options
+  const getFilterOptions = () => {
+    const allTags = components.flatMap(component => component.tags || [])
+    const uniqueTags = [...new Set(allTags)]
+    return [
+      { key: 'all', label: 'All' },
+      ...uniqueTags.map(tag => ({ key: tag, label: tag }))
+    ]
+  }
+
+  const filteredComponents = activeFilter === 'all' 
+    ? components 
+    : components.filter(component => 
+        component.tags && component.tags.includes(activeFilter)
+      )
+
+  const fetchComponents = async () => {
+    try {
+      setLoading(true)
+      const response = await componentsAPI.getAll()
+      console.log('Components API response:', response)
+      
+      if (response.components) {
+        setComponents(response.components)
+      } else {
+        setError('Failed to fetch components')
+      }
+    } catch (err) {
+      console.error('Error fetching components:', err)
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const fetchComponents = async () => {
-      try {
-        setLoading(true)
-        const response = await componentsAPI.getAll()
-        console.log('Components API response:', response)
-        
-        if (response.success && response.data && response.data.components) {
-          setComponents(response.data.components)
-        } else {
-          setError('Failed to fetch components')
-        }
-      } catch (err) {
-        console.error('Error fetching components:', err)
-        setError(err.message)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchComponents()
   }, [])
 
@@ -420,55 +473,121 @@ const Components = () => {
     )
   }
 
-  return (
-    <Box>
-      <Flex align="center" justify="between" className="mb-6">
-        <Text size="8" weight="bold">Components</Text>
-        <Button variant="solid" size="3">
-          <ColorWheelIcon className="w-4 h-4 mr-2" />
-          Add Component
-        </Button>
-      </Flex>
+  const filterOptions = getFilterOptions()
 
-      {components.length === 0 ? (
-        <Box className="p-8 text-center">
-          <Text size="4" color="gray">No components found</Text>
+  return (
+    <Box className="space-y-6">
+      <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 pb-4">
+        <Flex justify="between" align="center" className="mb-4">
+          <Text size="8" weight="bold">Components</Text>
+          <Button 
+            variant="solid" 
+            size="3" 
+            className="inline-flex items-center gap-1"
+            onClick={() => {
+              setSelectedComponent(null)
+              setShowEditModal(true)
+            }}
+          >
+            <PlusIcon className="w-4 h-4" />
+            Add Component
+          </Button>
+        </Flex>
+        
+        {/* Filter Badges */}
+        {filterOptions.length > 1 && (
+          <Flex gap="2" wrap="wrap">
+            {filterOptions.map((filter) => (
+              <Button
+                key={filter.key}
+                variant={activeFilter === filter.key ? "solid" : "soft"}
+                size="1"
+                onClick={() => setActiveFilter(filter.key)}
+                style={{ borderRadius: '9999px' }}
+              >
+                {filter.label}
+              </Button>
+            ))}
+          </Flex>
+        )}
+      </div>
+
+      {filteredComponents.length === 0 ? (
+        <Box className="p-8 text-center bg-gray-1">
+          <Text size="4" color="gray">
+            {activeFilter === 'all' ? 'No components found' : `No components found with tag "${activeFilter}"`}
+          </Text>
         </Box>
       ) : (
         <Flex direction="column" gap="4">
-          {components.map((component) => (
-            <Box key={component._id} className="p-4 bg-card border border-border rounded-lg hover:shadow-md transition-shadow">
-              <Flex align="center" justify="between">
+          {filteredComponents.map((component) => (
+            <Box key={component._id} id={component._id} className="p-6 border rounded-lg bg-card">
+              <Flex direction="column" gap="4">
                 <Box>
-                  <Text size="4" weight="semibold">{component.name}</Text>
-                  <Text size="2" color="gray" className="mt-1">{component.description}</Text>
+                  <Text size="5" weight="bold">{component.name}</Text>
+                  {component.description && (
+                    <Text size="3" color="gray" className="mt-1">{component.description}</Text>
+                  )}
                   {component.tags && component.tags.length > 0 && (
                     <Flex gap="2" className="mt-2">
                       {component.tags.map((tag, index) => (
-                        <Box key={index} className="px-2 py-1 bg-accent text-accent-foreground rounded text-xs">
+                        <Box key={index} className="px-2 py-1 bg-accent text-accent-foreground rounded-full text-xs">
                           {tag}
                         </Box>
                       ))}
                     </Flex>
                   )}
                 </Box>
+                
+                
                 <Flex gap="2">
-                  <Button variant="outline" size="2">Edit</Button>
-                  <Button variant="outline" size="2" color="red">Delete</Button>
+                  <EditComponentModal component={component} onUpdate={fetchComponents}>
+                    <Button variant="outline" size="2" className="inline-flex items-center">Edit</Button>
+                  </EditComponentModal>
+                  <DeleteComponentModal component={component} onDelete={fetchComponents}>
+                    <Button variant="outline" size="2" color="red" className="inline-flex items-center">Delete</Button>
+                  </DeleteComponentModal>
                 </Flex>
               </Flex>
             </Box>
           ))}
         </Flex>
       )}
-    </Box>
-  )
+
+      {/* Modals */}
+        <EditComponentModal 
+          component={selectedComponent} 
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onUpdate={fetchComponents}
+        />
+        <DeleteComponentModal 
+          component={selectedComponent}
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onDelete={fetchComponents}
+        />
+      </Box>
+    )
 }
 
-const Tokens = () => {
+const DesignTokens = () => {
   const [tokens, setTokens] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [activeFilter, setActiveFilter] = useState('all')
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [selectedToken, setSelectedToken] = useState(null)
+
+  const filterOptions = [
+    { key: 'all', label: 'All' },
+    { key: 'colors', label: 'Colors' },
+    { key: 'typography', label: 'Typography' },
+    { key: 'spacing', label: 'Spacing' },
+    { key: 'border-radius', label: 'Border Radius' },
+    { key: 'blur', label: 'Blur' }
+  ]
 
   useEffect(() => {
     const fetchTokens = async () => {
@@ -477,8 +596,8 @@ const Tokens = () => {
         const response = await tokensAPI.getAll()
         console.log('Tokens API response:', response)
         
-        if (response.success && response.data && response.data.tokens) {
-          setTokens(response.data.tokens)
+        if (response.tokens) {
+          setTokens(response.tokens)
         } else {
           setError('Failed to fetch tokens')
         }
@@ -493,78 +612,353 @@ const Tokens = () => {
     fetchTokens()
   }, [])
 
-  console.log('Tokens render - Loading:', loading, 'Count:', tokens.length, 'Error:', error)
-
   if (loading) {
     return (
-      <Box>
-        <Text size="8" weight="bold" className="mb-6">Design Tokens</Text>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <Text size="8" weight="bold">Design Tokens</Text>
+        </div>
         <Text>Loading tokens...</Text>
-      </Box>
+      </div>
     )
   }
 
   if (error) {
     return (
-      <Box>
-        <Text size="8" weight="bold" className="mb-6">Design Tokens</Text>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <Text size="8" weight="bold">Design Tokens</Text>
+        </div>
         <Text color="red">Error: {error}</Text>
-      </Box>
+      </div>
     )
   }
 
-  return (
-    <Box>
-      <Flex align="center" justify="between" className="mb-6">
-        <Text size="8" weight="bold">Design Tokens</Text>
-        <Button variant="solid" size="3">
-          <CircleIcon className="w-4 h-4 mr-2" />
-          Add Token
-        </Button>
-      </Flex>
+  // Group tokens by category
+  const colorTokens = tokens.filter(token => token.category === 'color');
+  const typographyTokens = tokens.filter(token => token.category === 'typography');
+  const spacingTokens = tokens.filter(token => token.category === 'spacing');
 
-      {tokens.length === 0 ? (
-        <Box className="p-8 text-center">
-          <Text size="4" color="gray">No tokens found</Text>
-        </Box>
-      ) : (
-        <Flex direction="column" gap="4">
-          {tokens.map((token) => (
-            <Box key={token._id} className="p-4 bg-card border border-border rounded-lg hover:shadow-md transition-shadow">
-              <Flex align="center" justify="between">
-                <Box>
-                  <Text size="4" weight="semibold">{token.name}</Text>
-                  <Text size="2" color="gray" className="mt-1">{token.description}</Text>
-                  <Flex align="center" gap="3" className="mt-2">
-                    <Text size="2" color="gray">Type: {token.type}</Text>
-                    <Text size="2" color="gray">Value: {token.value}</Text>
-                    {token.category && (
-                      <Box className="px-2 py-1 bg-accent text-accent-foreground rounded text-xs">
-                        {token.category}
-                      </Box>
-                    )}
-                  </Flex>
-                </Box>
-                <Flex gap="2">
-                  <Button variant="outline" size="2">Edit</Button>
-                  <Button variant="outline" size="2" color="red">Delete</Button>
-                </Flex>
-              </Flex>
-            </Box>
+  return (
+    <div className="space-y-8">
+      <div className="sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-10 pb-4">
+        <div className="flex items-center justify-between mb-4">
+          <Text size="8" weight="bold">Design Tokens</Text>
+          <Button 
+            variant="solid" 
+            size="3" 
+            className="inline-flex items-center gap-1"
+            onClick={() => {
+              setSelectedToken(null)
+              setShowEditModal(true)
+            }}
+          >
+            <PlusIcon className="w-4 h-4" />
+            Add Token
+          </Button>
+        </div>
+        
+        {/* Filter Badges */}
+        <Flex gap="2" wrap="wrap">
+          {filterOptions.map((filter) => (
+            <Button
+              key={filter.key}
+              variant={activeFilter === filter.key ? "solid" : "soft"}
+              size="1"
+              onClick={() => setActiveFilter(filter.key)}
+              style={{ borderRadius: '9999px' }}
+            >
+              {filter.label}
+            </Button>
           ))}
         </Flex>
+      </div>
+
+      {(activeFilter === 'all' || activeFilter === 'colors') && colorTokens.length > 0 && (
+        <div id="colors" className="space-y-4">
+          <ColorGrid tokens={colorTokens} />
+        </div>
       )}
-    </Box>
+
+      {(activeFilter === 'all' || activeFilter === 'typography') && typographyTokens.length > 0 && (
+        <div id="typography" className="space-y-4">
+          <FontSize tokens={typographyTokens} />
+        </div>
+      )}
+
+      {(activeFilter === 'all' || activeFilter === 'spacing') && spacingTokens.length > 0 && (
+        <div id="spacing" className="space-y-4">
+          <Spacing tokens={spacingTokens} />
+        </div>
+      )}
+
+      {(activeFilter === 'all' || activeFilter === 'border-radius') && (
+        <div id="border-radius" className="space-y-4">
+          <BorderRadius />
+        </div>
+      )}
+
+      {(activeFilter === 'all' || activeFilter === 'blur') && (
+        <div id="blur" className="space-y-4">
+          <Blur />
+        </div>
+      )}
+
+      {activeFilter === 'all' && tokens.filter(token => !['color', 'typography', 'spacing'].includes(token.category)).length > 0 && (
+        <div className="space-y-4">
+          <Text size="6" weight="bold">Custom Tokens</Text>
+          <Flex direction="column" gap="4">
+            {tokens.filter(token => !['color', 'typography', 'spacing'].includes(token.category)).map((token) => (
+              <Box key={token._id} id={token._id} className="p-4 border rounded-lg bg-card">
+                <Flex direction="column" gap="2">
+                  <Box>
+                    <Text size="4" weight="bold">{token.name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}</Text>
+                    {token.description && (
+                      <Text size="2" color="gray" className="mt-1">{token.description}</Text>
+                    )}
+                    <Text size="2" className="mt-1">
+                      <strong>Type:</strong> {token.type} | <strong>Value:</strong> {token.value}
+                    </Text>
+                  </Box>
+                  <Flex gap="2">
+                    <EditTokenModal token={token} onUpdate={() => fetchTokens()}>
+                      <Button variant="outline" size="2" className="inline-flex items-center">Edit</Button>
+                    </EditTokenModal>
+                    <DeleteTokenModal token={token} onDelete={() => fetchTokens()}>
+                      <Button variant="outline" size="2" color="red" className="inline-flex items-center">Delete</Button>
+                    </DeleteTokenModal>
+                  </Flex>
+                </Flex>
+              </Box>
+            ))}
+          </Flex>
+        </div>
+      )}
+
+      {tokens.length === 0 && (
+        <div className="p-8 text-center">
+          <Text size="4" color="gray">No tokens found</Text>
+        </div>
+      )}
+
+      {/* Modals */}
+      <EditTokenModal 
+        token={selectedToken} 
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        onUpdate={() => {
+          fetchTokens()
+          setShowEditModal(false)
+        }}
+      />
+      <DeleteTokenModal 
+        token={selectedToken}
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onDelete={() => {
+          fetchTokens()
+          setShowDeleteModal(false)
+        }}
+      />
+    </div>
   )
 }
 
 const Documentation = () => {
   return (
-    <Box>
-      <Text size="8" weight="bold" className="mb-6">Documentation</Text>
-      <Text size="4" className="mb-4">Welcome to the Design System documentation.</Text>
-      <Text>This section will contain comprehensive documentation for all components and design tokens.</Text>
-    </Box>
+    <Container size="4" className="py-8">
+      <Flex direction="column" gap="6">
+        {/* Hero Header */}
+        <div className="h-64 bg-[#1d1d20] dark:bg-gray-12 rounded-2xl relative overflow-hidden">
+          <Flex className="h-full relative z-10">
+            {/* Text Block */}
+            <div className="w-1/2 flex flex-col justify-center p-8">
+              <Text size="9" weight="bold" className="text-[#fcfcfd] dark:text-gray-12 mb-2 block">Documentation</Text>
+              <Text size="4" className="text-[#fcfcfd] dark:text-gray-11">
+                Complete guides and resources for implementing and using the design system effectively
+              </Text>
+            </div>
+            {/* Visual Block */}
+            <Box className="flex-1 relative rounded-r-2xl overflow-hidden h-full">
+              <img 
+                src="https://imagedelivery.net/N-MD9o_LYLdDJqNonHl96g/0c8369e2-2e3d-419c-f08a-7e4978e28400/public"
+                alt="Documentation illustration"
+                className="w-full h-full object-cover"
+              />
+            </Box>
+          </Flex>
+        </div>
+
+        <div className="space-y-8">
+          {/* Overview Section */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold">Design System Overview</h2>
+            <p className="text-muted-foreground">
+              This design system provides a comprehensive set of components, design tokens, and guidelines 
+              to ensure consistency across all applications and interfaces.
+            </p>
+          </div>
+
+          {/* Getting Started */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold">Getting Started</h2>
+            <div className="space-y-3">
+              <div>
+                <h3 className="text-lg font-medium mb-2">Installation</h3>
+                <div className="bg-muted p-4 rounded-lg">
+                  <code className="text-sm">npm install @company/design-system</code>
+                </div>
+              </div>
+              <div>
+                <h3 className="text-lg font-medium mb-2">Basic Usage</h3>
+                <div className="bg-muted p-4 rounded-lg">
+                  <pre className="text-sm">
+{`import { Button, Card } from '@company/design-system'
+
+function App() {
+  return (
+    <Card>
+      <Button variant="primary">Get Started</Button>
+    </Card>
+  )
+}`}
+                  </pre>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Components Section */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold">Components</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="border rounded-lg p-4 space-y-2">
+                <h3 className="font-medium">Button</h3>
+                <p className="text-sm text-muted-foreground">
+                  Interactive element for user actions with multiple variants and sizes.
+                </p>
+                <div className="flex gap-2">
+                  <Button size="2" variant="solid">Primary</Button>
+                  <Button size="2" variant="outline">Secondary</Button>
+                </div>
+              </div>
+              
+              <div className="border rounded-lg p-4 space-y-2">
+                <h3 className="font-medium">Card</h3>
+                <p className="text-sm text-muted-foreground">
+                  Container component for grouping related content with consistent styling.
+                </p>
+                <div className="bg-card border rounded p-3 text-sm">
+                  Sample card content
+                </div>
+              </div>
+              
+              <div className="border rounded-lg p-4 space-y-2">
+                <h3 className="font-medium">Input</h3>
+                <p className="text-sm text-muted-foreground">
+                  Form input elements with validation states and consistent styling.
+                </p>
+                <input 
+                  className="w-full px-3 py-2 border rounded text-sm" 
+                  placeholder="Sample input"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Design Tokens Section */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold">Design Tokens</h2>
+            <p className="text-muted-foreground">
+              Design tokens are the visual design atoms of the design system. They store visual design 
+              attributes like colors, typography, spacing, and more.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-3">
+                <h3 className="text-lg font-medium">Colors</h3>
+                <p className="text-sm text-muted-foreground">
+                  Semantic color palette including primary, secondary, and state colors.
+                </p>
+                <div className="flex gap-2">
+                  <div className="w-8 h-8 bg-primary rounded"></div>
+                  <div className="w-8 h-8 bg-secondary rounded"></div>
+                  <div className="w-8 h-8 bg-accent rounded"></div>
+                </div>
+              </div>
+              
+              <div className="space-y-3">
+                <h3 className="text-lg font-medium">Typography</h3>
+                <p className="text-sm text-muted-foreground">
+                  Font sizes, weights, and line heights for consistent text hierarchy.
+                </p>
+                <div className="space-y-1">
+                  <div className="text-2xl font-bold">Heading 1</div>
+                  <div className="text-lg font-semibold">Heading 2</div>
+                  <div className="text-base">Body text</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Guidelines Section */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold">Guidelines</h2>
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-medium mb-2">Accessibility</h3>
+                <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                  <li>All components meet WCAG 2.1 AA standards</li>
+                  <li>Color contrast ratios exceed 4.5:1 for normal text</li>
+                  <li>Keyboard navigation is supported throughout</li>
+                  <li>Screen reader compatible with proper ARIA labels</li>
+                </ul>
+              </div>
+              
+              <div>
+                <h3 className="text-lg font-medium mb-2">Best Practices</h3>
+                <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                  <li>Use semantic HTML elements when possible</li>
+                  <li>Follow the established spacing scale for layouts</li>
+                  <li>Maintain consistent component usage patterns</li>
+                  <li>Test components across different screen sizes</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Resources Section */}
+          <div className="space-y-4">
+            <h2 className="text-2xl font-semibold">Resources</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="border rounded-lg p-4">
+                <h3 className="font-medium mb-2">Figma Library</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Access design files and component specifications
+                </p>
+                <Button size="2" variant="outline">View in Figma</Button>
+              </div>
+              
+              <div className="border rounded-lg p-4">
+                <h3 className="font-medium mb-2">GitHub Repository</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Source code, issues, and contribution guidelines
+                </p>
+                <Button size="2" variant="outline">View Repository</Button>
+              </div>
+              
+              <div className="border rounded-lg p-4">
+                <h3 className="font-medium mb-2">Changelog</h3>
+                <p className="text-sm text-muted-foreground mb-3">
+                  Latest updates and version history
+                </p>
+                <Button size="2" variant="outline">View Changes</Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Flex>
+    </Container>
   )
 }
 
@@ -630,14 +1024,16 @@ const Signin = ({ onLogin }) => {
           {!isLogin && (
             <Box>
               <Text size="2" weight="medium" className="mb-2 block">Name</Text>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full p-3 border border-border rounded-md bg-background text-foreground"
-                placeholder="Enter your name"
-                required={!isLogin}
-              />
+              <div className="border rounded-lg p-4">
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full p-3 border border-border rounded-md bg-background text-foreground"
+                  placeholder="Enter your name"
+                  required={!isLogin}
+                />
+              </div>
             </Box>
           )}
 

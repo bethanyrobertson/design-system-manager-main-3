@@ -1,13 +1,22 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
+import ErrorBoundary from './ErrorBoundary.jsx'
 import './index.css'
-import { Theme, ThemePanel } from "@radix-ui/themes";
+import "@radix-ui/themes/styles.css";
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <Theme accentColor="crimson" grayColor="sand" radius="large" scaling="95%">
-    <App />
-    </Theme>
-  </React.StrictMode>,
-)
+console.log('🚀 main.jsx: Starting React app...');
+console.log('🚀 main.jsx: Root element found:', document.getElementById('root'));
+
+try {
+  ReactDOM.createRoot(document.getElementById('root')).render(
+    <React.StrictMode>
+      <ErrorBoundary>
+        <App />
+      </ErrorBoundary>
+    </React.StrictMode>,
+  )
+  console.log('✅ main.jsx: React root created and rendered');
+} catch (error) {
+  console.error('❌ main.jsx: Error creating React root:', error);
+}

@@ -6,7 +6,7 @@ const { authenticateToken, requireRole } = require('../middleware/auth');
 const router = express.Router();
 
 // Get all tokens
-router.get('/', authenticateToken, async (req, res) => {
+router.get('/', async (req, res) => {
   try {
     const { 
       category, 
@@ -53,7 +53,7 @@ router.get('/', authenticateToken, async (req, res) => {
 });
 
 // Get single token
-router.get('/:id', authenticateToken, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     // Validate ObjectId format
     if (!req.params.id.match(/^[0-9a-fA-F]{24}$/)) {

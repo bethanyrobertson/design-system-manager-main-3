@@ -15,7 +15,8 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/design
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
+// Serve React frontend build files
+app.use(express.static(path.join(__dirname, 'frontend/dist')));
 
 // Database connection with error handling
 const connectDB = async () => {
@@ -65,8 +66,13 @@ process.on('SIGINT', async () => {
   process.exit(0);
 });
 
+// API Routes - MUST come before static file serving
+app.use('/api/auth', authRoutes);
+app.use('/api/tokens', tokenRoutes);
+app.use('/api/components', componentRoutes);
+
 // Health check route
-app.get('/health', (req, res) => {
+app.get('/api/health', (req, res) => {
   const dbStatus = mongoose.connection.readyState;
   const dbStatusText = {
     0: 'disconnected',
@@ -83,36 +89,6 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/tokens', tokenRoutes);
-app.use('/api/components', componentRoutes);
-
-// Redirect root to components page (removing home page)
-app.get('/', (req, res) => {
-  res.redirect('/components');
-});
-
-// Serve component manager
-app.get('/components', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'components-manager.html'));
-});
-
-    // Redirect tokens to the unified components manager
-    app.get('/tokens', (req, res) => {
-      res.redirect('/components');
-    });
-
-    // Serve test tabs page
-    app.get('/test-tabs', (req, res) => {
-      res.sendFile(path.join(__dirname, 'public', 'test-tabs.html'));
-    });
-
-    // Serve documentation page
-    app.get('/docs', (req, res) => {
-      res.sendFile(path.join(__dirname, 'public', 'docs.html'));
-    });
-
 // Add a test route to verify app is working
 app.get('/api/test', (req, res) => {
   res.json({
@@ -120,7 +96,7 @@ app.get('/api/test', (req, res) => {
     database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
     routes: [
       'GET /',
-      'GET /health',
+      'GET /api/health',
       'GET /api/test',
       'POST /api/auth/login',
       'POST /api/auth/register',
@@ -140,12 +116,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Handle 404s
-app.use('*', (req, res) => {
-  res.status(404).json({
-    error: 'Route not found',
-    path: req.originalUrl
-  });
+// Serve React app for all non-API routes (SPA routing)
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'frontend/dist', 'index.html'));
 });
 
 // Start server

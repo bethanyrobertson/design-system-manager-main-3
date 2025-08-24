@@ -1,4 +1,10 @@
-const API_BASE_URL = 'http://localhost:3000/api';
+// Determine API base URL dynamically so the app works on any backend port.
+// In development, use the backend server on port 3001
+const API_BASE_URL = (typeof window !== 'undefined' && window.location)
+  ? (window.location.port === '5179' || window.location.port === '5178' || window.location.port === '5173'
+     ? 'http://localhost:3001/api' 
+     : `${window.location.origin}/api`)
+  : 'http://localhost:3001/api';
 
 // Generic API helper
 const apiCall = async (endpoint, options = {}) => {
@@ -73,7 +79,11 @@ export const componentsAPI = {
 // Tokens API
 export const tokensAPI = {
   // Get all tokens
-  getAll: () => apiCall('/tokens'),
+  getAll: (params = {}) => {
+    const queryString = new URLSearchParams(params).toString();
+    const endpoint = queryString ? `/tokens?${queryString}` : '/tokens';
+    return apiCall(endpoint);
+  },
   
   // Get token by ID
   getById: (id) => apiCall(`/tokens/${id}`),
