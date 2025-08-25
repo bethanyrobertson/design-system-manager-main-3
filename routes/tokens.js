@@ -24,7 +24,12 @@ router.get('/', async (req, res) => {
     }
 
     if (search) {
-      query.$text = { $search: search };
+      query.$or = [
+        { name: { $regex: search, $options: 'i' } },
+        { description: { $regex: search, $options: 'i' } },
+        { value: { $regex: search, $options: 'i' } },
+        { category: { $regex: search, $options: 'i' } }
+      ];
     }
 
     const sort = {};
@@ -261,7 +266,36 @@ router.delete('/:id', authenticateToken, requireRole(['admin']), async (req, res
     res.json({ message: 'Design token deleted successfully' });
   } catch (error) {
     console.error('Delete token error:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: 'Failed to delete design token' });
+  }
+});
+
+// Search tokens
+router.get('/search', async (req, res) => {
+  try {
+    const { q } = req.query;
+    
+    if (!q || q.trim().length === 0) {
+      return res.json([]);
+    }
+
+    const searchQuery = {
+      $or: [
+        { name: { $regex: q, $options: 'i' } },
+        { description: { $regex: q, $options: 'i' } },
+        { value: { $regex: q, $options: 'i' } },
+        { category: { $regex: q, $options: 'i' } }
+      ]
+    };
+
+    const tokens = await DesignToken.find(searchQuery)
+      .limit(10)
+      .sort({ name: 1 });
+
+    res.json(tokens);
+  } catch (error) {
+    console.error('Search tokens error:', error);
+    res.status(500).json({ error: 'Failed to search tokens' });
   }
 });
 

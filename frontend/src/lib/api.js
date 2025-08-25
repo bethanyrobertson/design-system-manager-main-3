@@ -1,10 +1,10 @@
 // Determine API base URL dynamically so the app works on any backend port.
 // In development, use the backend server on port 3001
 const API_BASE_URL = (typeof window !== 'undefined' && window.location)
-  ? (window.location.port === '5179' || window.location.port === '5178' || window.location.port === '5173'
-     ? 'http://localhost:3001/api' 
+  ? (window.location.port === '5175' || window.location.port === '5176' || window.location.port === '5179' || window.location.port === '5178' || window.location.port === '5173'
+     ? 'http://localhost:3000/api' 
      : `${window.location.origin}/api`)
-  : 'http://localhost:3001/api';
+  : 'http://localhost:3000/api';
 
 // Generic API helper
 const apiCall = async (endpoint, options = {}) => {
@@ -101,9 +101,12 @@ export const tokensAPI = {
   }),
   
   // Delete token
-  delete: (id) => apiCall(`/tokens/${id}`, {
+  deleteToken: (id) => apiCall(`/tokens/${id}`, {
     method: 'DELETE',
   }),
+  
+  // Search tokens
+  search: (query) => apiCall(`/tokens/search?q=${encodeURIComponent(query)}`),
 };
 
 // Auth API

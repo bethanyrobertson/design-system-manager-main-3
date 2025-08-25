@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Text, Button, Flex } from '@radix-ui/themes';
+import { Flex, Text, Button } from '@radix-ui/themes';
 import { CopyIcon } from '@radix-ui/react-icons';
+import { CodeSnippet } from '../application/code-snippet/code-snippet';
 
 export default function ColorGrid({ tokens }) {
   const [activeTab, setActiveTab] = useState('preview');
@@ -165,11 +166,7 @@ ${colorTokens.map(token => `  ${token.name}: '${token.value}'`).join(',\n')}
           </div>
         </div>
       ) : (
-        <div className="bg-muted/50 p-4 rounded border">
-          <pre className="text-xs overflow-x-auto">
-            <code>{codeString}</code>
-          </pre>
-        </div>
+        <CodeSnippet code={codeString} language="javascript" />
       )}
     </div>
   );

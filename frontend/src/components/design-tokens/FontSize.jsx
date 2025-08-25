@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { Text, Button, Flex } from '@radix-ui/themes';
+import { Flex, Text, Button } from '@radix-ui/themes';
+import { CopyIcon } from '@radix-ui/react-icons';
+import { CodeSnippet } from '../application/code-snippet/code-snippet';
 
 const FontSize = ({ tokens }) => {
   const [activeTab, setActiveTab] = useState('preview');
+  const [copiedToken, setCopiedToken] = useState(null);
 
   // Format token name for display
   const formatTokenName = (name) => {
@@ -210,11 +213,7 @@ ${typographyScale.map(token => `  '${token.name.toLowerCase().replace(/\s+/g, '-
           
         </div>
       ) : (
-        <div className="bg-muted/50 p-4 rounded border">
-          <pre className="text-xs overflow-x-auto">
-            <code>{codeString}</code>
-          </pre>
-        </div>
+        <CodeSnippet code={codeString} language="javascript" />
       )}
     </div>
   );

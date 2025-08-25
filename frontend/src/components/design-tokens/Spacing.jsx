@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { Text, Button, Flex } from '@radix-ui/themes';
+import { Flex, Text, Button } from '@radix-ui/themes';
+import { CopyIcon } from '@radix-ui/react-icons';
+import { CodeSnippet } from '../application/code-snippet/code-snippet';
 
 const Spacing = () => {
   const [activeTab, setActiveTab] = useState('preview');
+  const [copiedToken, setCopiedToken] = useState(null);
 
   const spacingValues = [
     { sx: '0', resolved: '0px', primitive: '0', pixels: 0 },
@@ -88,11 +91,7 @@ ${spacingValues.map(spacing => `  ${spacing.sx}: '${spacing.resolved}'`).join(',
           ))}
         </div>
       ) : (
-        <div className="bg-muted/50 p-4 rounded border">
-          <pre className="text-xs overflow-x-auto">
-            <code>{codeString}</code>
-          </pre>
-        </div>
+        <CodeSnippet code={codeString} language="javascript" />
       )}
     </div>
   );
